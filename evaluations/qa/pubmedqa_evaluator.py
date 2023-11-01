@@ -74,7 +74,7 @@ class PubMedQaEvaluator(CausalLanguageModelEvaluator):
     def extract_answer(batch_of_answers):
         extracted_answers = []
         for answer in batch_of_answers:
-            answer_parts = answer.split('##Final Decision Field:')
+            answer_parts = answer.split('##final decision field:')
             if len(answer_parts) > 1:
                 final_answer = answer_parts[-1].lower()
             else:
