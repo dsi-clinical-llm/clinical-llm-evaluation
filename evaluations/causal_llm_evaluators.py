@@ -1,6 +1,7 @@
 from evaluations.model_wrappers import CausalLanguageModelWrapper
 
 from abc import ABC, abstractmethod
+from typing import Union
 import logging
 import jinja2
 
@@ -19,7 +20,8 @@ class CausalLanguageModelEvaluator(ABC):
             dataset: DatasetDict,
             batch_size: int = 1,
             fine_tune_required: bool = False,
-            n_of_shots: int = 0
+            n_of_shots: int = 0,
+            test_size: Union[float, int] = 0.2
     ):
         self._evaluation_folder = evaluation_folder
         self._model = model
@@ -27,6 +29,7 @@ class CausalLanguageModelEvaluator(ABC):
         self._batch_size = batch_size
         self._fine_tune_required = fine_tune_required
         self._n_of_shots = n_of_shots
+        self._test_size = int(test_size) if test_size > 1 else test_size
 
         self.get_logger().info(
             f'evaluation_folder: {evaluation_folder}\n'
@@ -38,7 +41,7 @@ class CausalLanguageModelEvaluator(ABC):
         )
 
         if 'test' not in self._dataset:
-            self._dataset = self._dataset['train'].train_test_split(seed=RANDOM_SEED, test_size=0.2)
+            self._dataset = self._dataset['train'].train_test_split(seed=RANDOM_SEED, test_size=self._test_size)
 
     @abstractmethod
     def evaluate(self):

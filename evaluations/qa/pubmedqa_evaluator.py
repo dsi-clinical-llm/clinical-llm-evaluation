@@ -64,7 +64,7 @@ class PubMedQaEvaluator(CausalLanguageModelEvaluator):
 
     def one_hot_encode(self, labels):
         mapper = self.get_label_mapping()
-        return [mapper.get(label.lower(), 3) for label in labels]
+        return [mapper.get(label.lower().strip(), 3) for label in labels]
 
     @staticmethod
     def get_label_mapping():

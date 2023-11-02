@@ -86,7 +86,7 @@ class CausalLanguageModelApi(CausalLanguageModelWrapper):
             if response.status_code == 200:
                 result = response.json()['results'][0]['history']
                 answer = result['visible'][-1][1]
-                results.append(answer.strip().lower())
+                results.append(answer.lower().strip())
             else:
                 results.append('Unknown')
         return results

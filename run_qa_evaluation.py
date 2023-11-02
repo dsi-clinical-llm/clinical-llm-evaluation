@@ -12,6 +12,15 @@ def create_argparser():
         required=True
     )
     parser.add_argument(
+        '--test_size',
+        dest='test_size',
+        action='store',
+        help='Test size',
+        type=float,
+        default=0.2,
+        required=False
+    )
+    parser.add_argument(
         '--evaluation_folder',
         dest='evaluation_folder',
         action='store',
@@ -28,6 +37,7 @@ if __name__ == '__main__':
     )
     evaluator = PubMedQaEvaluator(
         model=model_wrapper,
-        evaluation_folder=args.evaluation_folder
+        evaluation_folder=args.evaluation_folder,
+        test_size=args.test_size
     )
     evaluator.evaluate()
