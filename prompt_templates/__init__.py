@@ -1,0 +1,1 @@
+from .qa.pubmed_qa_prompt_template import PUBMED_QA_PROMPT_TEMPLATE_V1, QA_PROMPTS
