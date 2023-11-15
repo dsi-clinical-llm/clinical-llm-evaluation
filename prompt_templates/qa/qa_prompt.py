@@ -17,13 +17,15 @@ class PubmedQuestionAnswerPromptBase(Prompt):
             self
     ):
         if self.model_response:
-            answer_parts = self.model_response.split('##final decision field:')
+            answer_parts = self.model_response.lower().split('##final decision field:')
             if len(answer_parts) > 1:
                 final_answer = answer_parts[-1].lower()
             else:
-                final_answer = 'unknown'
+                final_answer = answer_parts[0]
+            # Take the first word from the answer
+            final_answer = final_answer.split(' ')[0]
         else:
-            final_answer = None
+            final_answer = 'unknown'
         return final_answer
 
     @staticmethod
