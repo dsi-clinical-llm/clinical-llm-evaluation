@@ -1,0 +1,36 @@
+from jinja2 import Template, Environment
+
+from prompt_templates.prompt_abstract import Prompt
+from prompt_templates.qa.pubmed_qa_prompt_template import PUBMED_QA_PROMPT_TEMPLATE_BASE, PUBMED_QA_PROMPT_TEMPLATE_V1
+
+ENVIRONMENT = Environment()
+
+
+class PubmedQuestionAnswerPromptBase(Prompt):
+    # dict to map answer to an integer
+    answer_mapping = {'no': 0, 'yes': 1, 'maybe': 2, 'unknown': 3}
+
+    def get_prompt_template(self) -> Template:
+        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE)
+
+    def extract_answer(
+            self
+    ):
+        if self.model_response:
+            answer_parts = self.model_response.split('##final decision field:')
+            if len(answer_parts) > 1:
+                final_answer = answer_parts[-1].lower()
+            else:
+                final_answer = 'unknown'
+        else:
+            final_answer = None
+        return final_answer
+
+    @staticmethod
+    def map_answer(answer):
+        return PubmedQuestionAnswerPromptBase.answer_mapping.get(answer.lower().strip(), 3)
+
+
+class PubmedQuestionAnswerPromptV1(PubmedQuestionAnswerPromptBase):
+    def get_prompt_template(self) -> Template:
+        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_V1)

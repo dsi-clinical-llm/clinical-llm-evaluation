@@ -42,7 +42,7 @@ class CausalLanguageModelWrapper(ABC):
         pass
 
     @abstractmethod
-    def call(self, batch_of_prompts) -> List[str]:
+    def call(self, prompt) -> str:
         pass
 
     @classmethod
@@ -76,7 +76,13 @@ class CausalLanguageModelHuggingFace(CausalLanguageModelWrapper):
 
         self._do_sample = do_sample
         self._device = device
-        self._pipeline = pipeline(model=model_name_or_path, max_length=self._truncation_length, device=self._device)
+        self._pipeline = pipeline(
+            'text-generation',
+            model=model_name_or_path,
+            max_length=self._truncation_length,
+            device=self._device,
+            model_kwargs={"load_in_8bit": True}
+        )
 
         self.get_logger().info(
             f'model_name_or_path: {model_name_or_path}\n'
@@ -86,12 +92,9 @@ class CausalLanguageModelHuggingFace(CausalLanguageModelWrapper):
     def fine_tune(self):
         raise RuntimeError("CausalLanguageModelHuggingFace doesn't support fine-tuning currently.")
 
-    def call(self, batch_of_prompts):
-        processed_responses = []
-        responses = self._pipelin(batch_of_prompts, do_sample=self._do_sample)
-        for prompt, response in zip(batch_of_prompts, responses):
-            processed_responses.append(response[len(prompt):])
-        return processed_responses
+    def call(self, prompt):
+        response = self._pipelin(prompt, do_sample=self._do_sample)
+        return response[len(prompt):]
 
 
 class CausalLanguageModelApi(CausalLanguageModelWrapper):
@@ -111,15 +114,12 @@ class CausalLanguageModelApi(CausalLanguageModelWrapper):
     def fine_tune(self):
         raise RuntimeError("CausalLanguageModelApi doesn't support fine-tuning currently.")
 
-    def call(self, batch_of_prompts):
-        results = []
-        for prompt in batch_of_prompts:
-            request = self.get_model_parameter(prompt=prompt).to_dict()
-            response = requests.post(self._end_point, json=request)
-            if response.status_code == 200:
-                result = response.json()['results'][0]['history']
-                answer = result['visible'][-1][1]
-                results.append(answer.lower().strip())
-            else:
-                results.append('Unknown')
-        return results
+    def call(self, prompt):
+        request = self.get_model_parameter(prompt=prompt).to_dict()
+        response = requests.post(self._end_point, json=request)
+        if response.status_code == 200:
+            result = response.json()['results'][0]['history']
+            answer = result['visible'][-1][1]
+        else:
+            answer = 'Unknown'
+        return answer
