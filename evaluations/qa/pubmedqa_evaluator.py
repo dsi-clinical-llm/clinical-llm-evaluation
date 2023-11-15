@@ -5,17 +5,12 @@ from typing import List
 
 import evaluate
 import pandas as pd
-from datasets import load_dataset
 
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
 from prompt_templates.qa.qa_prompt import PubmedQuestionAnswerPromptBase, PubmedQuestionAnswerPromptV1
 
 
 class PubMedQaEvaluator(CausalLanguageModelEvaluator):
-
-    def __init__(self, *args, **kwargs):
-        pubmed_qa_dataset = load_dataset('pubmed_qa', 'pqa_labeled')
-        super(PubMedQaEvaluator, self).__init__(dataset=pubmed_qa_dataset, *args, **kwargs)
 
     def get_prompt_classes(self) -> List[PubmedQuestionAnswerPromptBase]:
         return [
