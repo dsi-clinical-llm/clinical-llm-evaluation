@@ -38,6 +38,10 @@ class Prompt(ABC):
         return self.__class__.__name__
 
     @abstractmethod
+    def is_fine_tunable(self):
+        pass
+
+    @abstractmethod
     def get_prompt_template(self) -> Template:
         pass
 

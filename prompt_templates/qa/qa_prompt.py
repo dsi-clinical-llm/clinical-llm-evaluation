@@ -32,7 +32,13 @@ class PubmedQuestionAnswerPromptBase(Prompt):
     def map_answer(answer):
         return PubmedQuestionAnswerPromptBase.answer_mapping.get(answer.lower().strip(), 3)
 
+    def is_fine_tunable(self):
+        return True
+
 
 class PubmedQuestionAnswerPromptV1(PubmedQuestionAnswerPromptBase):
     def get_prompt_template(self) -> Template:
         return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_V1)
+
+    def is_fine_tunable(self):
+        return False
