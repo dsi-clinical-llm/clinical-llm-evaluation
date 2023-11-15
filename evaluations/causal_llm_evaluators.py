@@ -5,7 +5,6 @@ from typing import List
 from datetime import datetime
 from tqdm import tqdm
 import logging
-import jinja2
 import os
 from pathlib import Path
 import pandas as pd

@@ -1,7 +1,7 @@
 from jinja2 import Template, Environment
 
 from prompt_templates.prompt_abstract import Prompt
-from prompt_templates.qa.pubmed_qa_prompt_template import PUBMED_QA_PROMPT_TEMPLATE_BASE_V1, \
+from prompt_templates import PUBMED_QA_PROMPT_TEMPLATE_BASE_V1, \
     PUBMED_QA_PROMPT_TEMPLATE_BASE_V2, PUBMED_QA_PROMPT_TEMPLATE_COT_V1
 
 ENVIRONMENT = Environment()

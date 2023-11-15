@@ -1,1 +1,2 @@
-from .qa.pubmed_qa_prompt_template import PUBMED_QA_PROMPT_TEMPLATE_COT_V1, QA_PROMPTS
+from .qa.pubmed_qa_prompt_template import PUBMED_QA_PROMPT_TEMPLATE_COT_V1, PUBMED_QA_PROMPT_TEMPLATE_BASE_V1, \
+    PUBMED_QA_PROMPT_TEMPLATE_BASE_V2
