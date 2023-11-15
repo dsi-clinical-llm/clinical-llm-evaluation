@@ -13,8 +13,6 @@ import pandas as pd
 from datasets.dataset_dict import DatasetDict
 from prompt_templates.prompt_abstract import Prompt
 
-ENVIRONMENT = jinja2.Environment()
-
 
 class CausalLanguageModelEvaluator(ABC):
 
