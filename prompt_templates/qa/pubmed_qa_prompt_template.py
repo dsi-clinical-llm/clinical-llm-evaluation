@@ -1,3 +1,27 @@
+PUBMED_QA_PROMPT_TEMPLATE_BASE_V3 = '''
+Instruction: based on the abstract, answer the question by simply choosing one of the following options.  Simply provide the option as the answer, do not provide any explanations and add text to the answer.
+
+Abstract: {{abstract}}
+Question: {{question}}
+
+Options: 
+0. no
+1. yes
+2. maybe
+'''
+
+PUBMED_QA_PROMPT_TEMPLATE_BASE_V4 = '''
+Instruction: Answer the question based on the abstract by simply choosing one of the following options.  Simply provide the option as the answer, do not provide any explanations and add text to the answer.
+
+Question: {{question}}
+Abstract: {{abstract}}
+
+Options: 
+0. no
+1. yes
+2. maybe
+'''
+
 PUBMED_QA_PROMPT_TEMPLATE_BASE_V1 = '''
 #Instruction:
 - Answer the following question using the abstract provided in the input using the template defined in the response section.
@@ -46,4 +70,3 @@ PUBMED_QA_PROMPT_TEMPLATE_COT_V1 = '''
 ##Evidence Field:
 ##Final Decision Field:
 '''
-
