@@ -2,9 +2,8 @@ import json
 from jinja2 import Template, Environment
 
 from prompt_templates.prompt_abstract import Prompt
-from prompt_templates import PUBMED_QA_PROMPT_TEMPLATE_BASE_V1, \
-    PUBMED_QA_PROMPT_TEMPLATE_BASE_V2, PUBMED_QA_PROMPT_TEMPLATE_COT_V1, PUBMED_QA_PROMPT_TEMPLATE_BASE_V3, \
-    PUBMED_QA_PROMPT_TEMPLATE_BASE_V4, PUBMED_QA_PROMPT_TEMPLATE_BASE_V5
+from prompt_templates.qa.pubmed_qa_prompt_template import PUBMED_QA_PROMPT_TEMPLATE_COT_V1, \
+    PUBMED_QA_PROMPT_TEMPLATE_BASE, PUBMED_QA_PROMPT_TEMPLATE_BASE_V1
 
 ENVIRONMENT = Environment()
 
@@ -14,7 +13,7 @@ class PubmedQuestionAnswerPromptBase(Prompt):
     answer_mapping = {'no': 0, 'yes': 1, 'maybe': 2, 'unknown': 3}
 
     def get_prompt_template(self) -> Template:
-        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V1)
+        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE)
 
     def extract_answer(
             self
@@ -51,30 +50,12 @@ class PubmedQuestionAnswerPromptBase(Prompt):
         return True
 
 
-class PubmedQuestionAnswerPromptV2(PubmedQuestionAnswerPromptBase):
-    def get_prompt_template(self) -> Template:
-        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V2)
-
-
-class PubmedQuestionAnswerPromptV3(PubmedQuestionAnswerPromptBase):
+class PubmedQuestionAnswerPromptV1(PubmedQuestionAnswerPromptBase):
 
     def get_prompt_template(self) -> Template:
-        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V3)
-
-
-class PubmedQuestionAnswerPromptV4(PubmedQuestionAnswerPromptV3):
-    def get_prompt_template(self) -> Template:
-        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V4)
-
-
-class PubmedQuestionAnswerPromptV5(PubmedQuestionAnswerPromptBase):
-    def get_prompt_template(self) -> Template:
-        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V5)
+        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V1)
 
 
 class PubmedQuestionAnswerPromptCotV1(PubmedQuestionAnswerPromptBase):
     def get_prompt_template(self) -> Template:
         return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_COT_V1)
-
-    def is_fine_tunable(self):
-        return False

@@ -20,7 +20,7 @@ class Prompt(ABC):
 
     def to_dict(self) -> Dict[str, Union[str, int]]:
         answer = self.extract_answer()
-        mapped_answer = self.map_answer(answer)
+        mapped_answer = self.map_answer(str(answer))
         return {
             'record_id': self.record_id,
             'prompt': self.prompt,
