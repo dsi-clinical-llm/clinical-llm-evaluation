@@ -8,7 +8,8 @@ import pandas as pd
 
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
 from prompt_templates.qa.qa_prompt import PubmedQuestionAnswerPromptBase, PubmedQuestionAnswerPromptV2, \
-    PubmedQuestionAnswerPromptCotV1, PubmedQuestionAnswerPromptV3, PubmedQuestionAnswerPromptV4
+    PubmedQuestionAnswerPromptCotV1, PubmedQuestionAnswerPromptV3, PubmedQuestionAnswerPromptV4, \
+    PubmedQuestionAnswerPromptV5
 
 
 class PubMedQaEvaluator(CausalLanguageModelEvaluator):
@@ -19,6 +20,7 @@ class PubMedQaEvaluator(CausalLanguageModelEvaluator):
             PubmedQuestionAnswerPromptV2,
             PubmedQuestionAnswerPromptV3,
             PubmedQuestionAnswerPromptV4,
+            PubmedQuestionAnswerPromptV5,
             PubmedQuestionAnswerPromptCotV1
         ]
 

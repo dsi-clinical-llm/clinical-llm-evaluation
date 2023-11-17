@@ -6,7 +6,7 @@ from typing import List, Dict, Union
 class ModelParameter:
     user_input: str = ''
     mode: str = 'instruct'
-    instruction_template: str = 'Mistral'
+    instruction_template: str = 'Llama-v2'
     max_new_tokens: int = 1000
     auto_max_new_tokens: bool = True
     max_tokens_second: int = 0

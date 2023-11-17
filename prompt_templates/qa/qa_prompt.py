@@ -1,10 +1,10 @@
-import re
+import json
 from jinja2 import Template, Environment
 
 from prompt_templates.prompt_abstract import Prompt
 from prompt_templates import PUBMED_QA_PROMPT_TEMPLATE_BASE_V1, \
     PUBMED_QA_PROMPT_TEMPLATE_BASE_V2, PUBMED_QA_PROMPT_TEMPLATE_COT_V1, PUBMED_QA_PROMPT_TEMPLATE_BASE_V3, \
-    PUBMED_QA_PROMPT_TEMPLATE_BASE_V4
+    PUBMED_QA_PROMPT_TEMPLATE_BASE_V4, PUBMED_QA_PROMPT_TEMPLATE_BASE_V5
 
 ENVIRONMENT = Environment()
 
@@ -19,17 +19,29 @@ class PubmedQuestionAnswerPromptBase(Prompt):
     def extract_answer(
             self
     ):
+        final_answer = None
         if self.model_response:
-            answer_parts = self.model_response.lower().split('##final decision field:')
-            if len(answer_parts) > 1:
-                final_answer = answer_parts[-1].lower()
-            else:
-                final_answer = answer_parts[0]
-            # Take the first word from the answer
-            final_answer = final_answer.split(' ')[0]
-        else:
-            final_answer = 'unknown'
-        return final_answer
+            # This is done for loading the json object
+            response = self.model_response.replace("&quot;", "\"")
+            try:
+                json_object = json.loads(response)
+                final_answer = json_object.get('correct_option', 'unknown')
+            except Exception as e:
+                print(e)
+
+            # Try to target the json object
+            if not final_answer:
+                left_bracket_index = response.find('{')
+                right_bracket_index = response.find('}')
+                # Assuming the first match is the JSON string
+                json_string = response[left_bracket_index:right_bracket_index + 1]
+                try:
+                    json_object = json.loads(json_string)
+                    final_answer = json_object.get('correct_option', 'unknown')
+                except Exception as e:
+                    print(e)
+
+        return final_answer if final_answer else 'unknown'
 
     @staticmethod
     def map_answer(answer):
@@ -43,8 +55,21 @@ class PubmedQuestionAnswerPromptV2(PubmedQuestionAnswerPromptBase):
     def get_prompt_template(self) -> Template:
         return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V2)
 
-    def is_fine_tunable(self):
-        return False
+
+class PubmedQuestionAnswerPromptV3(PubmedQuestionAnswerPromptBase):
+
+    def get_prompt_template(self) -> Template:
+        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V3)
+
+
+class PubmedQuestionAnswerPromptV4(PubmedQuestionAnswerPromptV3):
+    def get_prompt_template(self) -> Template:
+        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V4)
+
+
+class PubmedQuestionAnswerPromptV5(PubmedQuestionAnswerPromptBase):
+    def get_prompt_template(self) -> Template:
+        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V5)
 
 
 class PubmedQuestionAnswerPromptCotV1(PubmedQuestionAnswerPromptBase):
@@ -53,31 +78,3 @@ class PubmedQuestionAnswerPromptCotV1(PubmedQuestionAnswerPromptBase):
 
     def is_fine_tunable(self):
         return False
-
-
-class PubmedQuestionAnswerPromptV3(PubmedQuestionAnswerPromptBase):
-
-    def get_prompt_template(self) -> Template:
-        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V3)
-
-    def extract_answer(
-            self
-    ):
-        if self.model_response:
-            parsed_answer = self.model_response.lower()
-            parsed_answer = parsed_answer.replace('answer', '').replace('option', '')
-            parsed_answer = re.sub('[^a-z]', '', parsed_answer)
-            # Take the first word from the answer
-            final_answer = parsed_answer.split(' ')[0]
-        else:
-            final_answer = 'unknown'
-
-        return final_answer
-
-    def is_fine_tunable(self):
-        return False
-
-
-class PubmedQuestionAnswerPromptV4(PubmedQuestionAnswerPromptV3):
-    def get_prompt_template(self) -> Template:
-        return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_BASE_V4)
