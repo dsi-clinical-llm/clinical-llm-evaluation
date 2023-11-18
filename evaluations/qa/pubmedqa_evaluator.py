@@ -5,8 +5,8 @@ import numpy as np
 
 from prompt_templates.prompt_abstract import Prompt
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
-from prompt_templates.qa.qa_prompt import PubmedQuestionAnswerPromptBase, \
-    PubmedQuestionAnswerPromptV1, PubmedQuestionAnswerPromptCotV1
+from prompt_templates.qa.qa_prompt import PubmedQuestionAnswerPromptJsonV1, \
+    PubmedQuestionAnswerPromptJsonV2, PubmedQuestionAnswerPromptJsonV3, PubmedQuestionAnswerPromptBaseV1
 
 
 class PointWiseScore:
@@ -25,15 +25,16 @@ class PubMedQaEvaluator(CausalLanguageModelEvaluator):
 
     def get_prompt_classes(self) -> List[Prompt]:
         return [
-            PubmedQuestionAnswerPromptBase,
-            PubmedQuestionAnswerPromptV1,
-            PubmedQuestionAnswerPromptCotV1
+            PubmedQuestionAnswerPromptBaseV1,
+            PubmedQuestionAnswerPromptJsonV1,
+            PubmedQuestionAnswerPromptJsonV2,
+            PubmedQuestionAnswerPromptJsonV3
         ]
 
     def generate_prompts(
             self,
             record
-    ) -> List[PubmedQuestionAnswerPromptBase]:
+    ) -> List[PubmedQuestionAnswerPromptJsonV1]:
         identifier = record['pubid']
         question = record['question']
         abstract = '\n'.join(record['context']['contexts'])
