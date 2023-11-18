@@ -1,6 +1,12 @@
 import inspect
-
+import re
 from datasets import DatasetDict
+
+regex = re.compile('[^a-zA-Z]')
+
+
+def remove_illegal_chars(text):
+    return regex.sub('', text)
 
 
 def split_dataset(dataset, n):

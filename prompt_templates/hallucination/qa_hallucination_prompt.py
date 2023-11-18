@@ -3,6 +3,7 @@ import random
 from jinja2 import Template, Environment
 from typing import Union, Dict
 
+from utils.utils import remove_illegal_chars
 from prompt_templates.prompt_abstract import Prompt
 from prompt_templates.hallucination.qa_hallucination_template import QA_HALLUCINATION_PROMPT_V1
 
@@ -46,6 +47,7 @@ class PubmedQuestionAnswerHallucinationPrompt(Prompt):
             try:
                 json_object = json.loads(response)
                 final_answer = json_object.get('is_answer_correct', 'unknown')
+                final_answer = remove_illegal_chars(final_answer)
             except Exception as e:
                 print(e)
 
@@ -58,6 +60,7 @@ class PubmedQuestionAnswerHallucinationPrompt(Prompt):
                 try:
                     json_object = json.loads(json_string)
                     final_answer = json_object.get('is_answer_correct', 'unknown')
+                    final_answer = remove_illegal_chars(final_answer)
                 except Exception as e:
                     print(e)
 

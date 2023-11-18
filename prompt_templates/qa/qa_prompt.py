@@ -1,14 +1,12 @@
-import re
 import json
 from jinja2 import Template, Environment
 
+from utils.utils import remove_illegal_chars
 from prompt_templates.prompt_abstract import Prompt
 from prompt_templates.qa.pubmed_qa_prompt_template import PUBMED_QA_PROMPT_TEMPLATE_COT_V1, \
     PUBMED_QA_PROMPT_TEMPLATE_BASE, PUBMED_QA_PROMPT_TEMPLATE_BASE_V1
 
 ENVIRONMENT = Environment()
-
-regex = re.compile('[^a-zA-Z]')
 
 
 class PubmedQuestionAnswerPromptBase(Prompt):
@@ -28,7 +26,7 @@ class PubmedQuestionAnswerPromptBase(Prompt):
             try:
                 json_object = json.loads(response)
                 final_answer = json_object.get('correct_option', 'unknown')
-                final_answer = regex.sub('', final_answer)
+                final_answer = remove_illegal_chars(final_answer)
             except Exception as e:
                 print(e)
 
@@ -41,7 +39,7 @@ class PubmedQuestionAnswerPromptBase(Prompt):
                 try:
                     json_object = json.loads(json_string)
                     final_answer = json_object.get('correct_option', 'unknown')
-                    final_answer = regex.sub('', final_answer)
+                    final_answer = remove_illegal_chars(final_answer)
                 except Exception as e:
                     print(e)
 
