@@ -11,7 +11,7 @@ class CausalLanguageModelChatGPT(CausalLanguageModelWrapper):
             *args,
             **kwargs
     ):
-        super(CausalLanguageModelChatGPT).__init__(*args, **kwargs)
+        super(CausalLanguageModelChatGPT, self).__init__(*args, **kwargs)
         self.openai_client = OpenAI(
             api_key=os.environ.get('OPEN_AI_KEY')
         )
@@ -20,12 +20,12 @@ class CausalLanguageModelChatGPT(CausalLanguageModelWrapper):
         raise NotImplemented('This capability has not been implemented yet')
 
     def call(self, prompt) -> str:
-        response = self.openai_client.chat.completions.create(
+        completion = self.openai_client.chat.completions.create(
             model=self.model,
             messages=[
                 {'role': 'system', 'content': 'You are a medical professional.'},
                 {'role': 'user', 'content': prompt}
             ],
-            max_tokens=self.max_new_tokens
+            max_tokens=self._max_new_tokens
         )
-        return response['choices'][0]['text']
+        return completion.choices[0].message.content
