@@ -1,3 +1,5 @@
+import inspect
+
 from datasets import DatasetDict
 
 
@@ -30,3 +32,33 @@ def create_train_test_partitions(
             })
         )
     return datasets
+
+
+def get_all_args(cls):
+    """
+    Iteratively get all the required arguments and arguments with a default value from the current class and all its
+    ancestor
+
+    classes :param
+    cls: :return:
+    """
+    required_args = []
+    default_args = []
+
+    # Iterate over the MRO in reverse (excluding 'object')
+    for c in reversed(cls.__mro__[:-1]):
+        if hasattr(c, '__init__'):
+            constructor_signature = inspect.signature(c.__init__)
+            for name, parameter in constructor_signature.parameters.items():
+                if name in ['self', 'args', 'kwargs']:
+                    continue
+
+                if parameter.default is inspect.Parameter.empty:
+                    if name not in required_args:
+                        required_args.append(name)
+
+                if parameter.default is not inspect.Parameter.empty:
+                    if name not in default_args:
+                        default_args.append(name)
+
+    return required_args, default_args

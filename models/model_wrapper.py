@@ -43,6 +43,10 @@ class CausalLanguageModelWrapper(ABC):
         pass
 
     @classmethod
+    def get_name(cls) -> str:
+        return cls.__name__
+
+    @classmethod
     def get_logger(cls):
         return logging.getLogger(cls.__name__)
 
@@ -57,5 +61,3 @@ class CausalLanguageModelWrapper(ABC):
             num_beams=self._num_beams,
             truncation_length=self._truncation_length
         )
-
-
