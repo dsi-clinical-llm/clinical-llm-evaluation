@@ -1,5 +1,6 @@
 from multiprocessing import Pool
 from evaluations import CausalLanguageModelApi, PubMedQaEvaluator
+from evaluations.hallucination.pubmedqa_hallucination_evaluator import PubMedQaHallucinationEvaluator
 
 from datasets import load_dataset
 from utils.utils import create_train_test_partitions
@@ -33,6 +34,11 @@ def create_argparser():
         default=1,
         required=False
     )
+    parser.add_argument(
+        '--is_hallucination_test',
+        dest='is_hallucination_test',
+        action='store_true',
+    )
     return parser.parse_args()
 
 
@@ -40,12 +46,14 @@ def main(
         process_id,
         server_name,
         sub_dataset,
-        evaluation_folder
+        evaluation_folder,
+        is_hallucination_test=False
 ):
     model_wrapper = CausalLanguageModelApi(
         server_name=server_name
     )
-    evaluator = PubMedQaEvaluator(
+    evaluator_class = PubMedQaHallucinationEvaluator if is_hallucination_test else PubMedQaEvaluator
+    evaluator = evaluator_class(
         dataset=sub_dataset,
         model=model_wrapper,
         evaluation_folder=evaluation_folder,
@@ -72,7 +80,7 @@ if __name__ == '__main__':
     pool_tuples = []
     for i in range(args.num_of_cores):
         pool_tuples.append(
-            (i, args.server_name, partitioned_datasets[i], args.evaluation_folder)
+            (i, args.server_name, partitioned_datasets[i], args.evaluation_folder, args.is_hallucination_test)
         )
 
     with Pool(processes=args.num_of_cores) as p:
