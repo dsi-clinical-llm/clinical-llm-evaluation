@@ -10,9 +10,9 @@ Question: {{question}}
 Abstract: {{abstract}}
 
 Options: 
-0: no
-1: yes
-2: maybe
+0. no
+1. yes
+2. maybe
 '''
 
 PUBMED_QA_PROMPT_TEMPLATE_BASE_V1 = '''
@@ -27,9 +27,9 @@ Abstract: {{abstract}}
 Question: {{question}}
 
 Options: 
-0: no
-1: yes
-2: maybe
+0. no
+1. yes
+2. maybe
 '''
 
 PUBMED_QA_PROMPT_TEMPLATE_COT_V1 = '''
@@ -46,7 +46,7 @@ Question: {{question}}
 Abstract: {{abstract}}
 
 Options: 
-0: no
-1: yes
-2: maybe
+0. no
+1. yes
+2. maybe
 '''
