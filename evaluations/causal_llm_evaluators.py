@@ -1,4 +1,4 @@
-from models.model_wrappers import CausalLanguageModelWrapper
+from models.model_wrapper import CausalLanguageModelWrapper
 
 from abc import ABC, abstractmethod
 from typing import List
