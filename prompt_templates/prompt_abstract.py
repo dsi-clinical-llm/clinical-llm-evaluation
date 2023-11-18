@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
 from typing import Union, Dict
 from jinja2 import Environment, Template
+from utils.utils import remove_non_utf8_characters
 
 ENVIRONMENT = Environment()
 
@@ -26,7 +27,7 @@ class Prompt(ABC):
             'prompt': self.prompt,
             'ground_truth': self.ground_truth,
             'mapped_ground_true': self.map_answer(self.ground_truth),
-            'model_response': self.model_response,
+            'model_response': remove_non_utf8_characters(self.model_response),
             'answer': answer,
             'mapped_answer': mapped_answer
         }

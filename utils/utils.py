@@ -5,6 +5,10 @@ from datasets import DatasetDict
 regex = re.compile('[^a-zA-Z]')
 
 
+def remove_non_utf8_characters(s):
+    return s.encode('utf-8', 'ignore').decode('utf-8')
+
+
 def remove_illegal_chars(text):
     return regex.sub('', text)
 
