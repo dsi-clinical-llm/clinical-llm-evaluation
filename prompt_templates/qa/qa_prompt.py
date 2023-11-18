@@ -77,9 +77,9 @@ class PubmedQuestionAnswerPromptBaseV1(Prompt):
         if self.model_response:
             parsed_answer = self.model_response.lower()
             parsed_answer = parsed_answer.replace('answer', '').replace('option', '')
-            parsed_answer = remove_illegal_chars(parsed_answer)
             # Take the first word from the answer
             final_answer = parsed_answer.split(' ')[0]
+            final_answer = remove_illegal_chars(final_answer)
         else:
             final_answer = 'unknown'
 
