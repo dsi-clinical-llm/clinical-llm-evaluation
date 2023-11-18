@@ -1,6 +1,6 @@
 from multiprocessing import Pool
 from evaluations import PubMedQaEvaluator
-from evaluations.hallucination.pubmedqa_hallucination_evaluator import PubMedQaHallucinationEvaluator
+from evaluations.qa.pubmedqa_hallucination_evaluator import PubMedQaHallucinationEvaluator
 from models import get_all_model_names, get_model_wrapper, CausalLanguageModelApi
 
 from datasets import load_dataset

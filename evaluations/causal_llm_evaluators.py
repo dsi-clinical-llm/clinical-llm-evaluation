@@ -23,7 +23,8 @@ class CausalLanguageModelEvaluator(ABC):
             batch_size: int = 1,
             fine_tune_required: bool = False,
             n_of_shots: int = 0,
-            process_id: int = None
+            process_id: int = None,
+            is_hallucination_test: bool = False
     ):
         self._evaluation_folder = evaluation_folder
         self._model = model
@@ -32,6 +33,7 @@ class CausalLanguageModelEvaluator(ABC):
         self._fine_tune_required = fine_tune_required
         self._n_of_shots = n_of_shots
         self._process_id = process_id
+        self._is_hallucination_test = is_hallucination_test
 
         self.get_logger().info(
             f'evaluation_folder: {evaluation_folder}\n'
@@ -40,6 +42,7 @@ class CausalLanguageModelEvaluator(ABC):
             f'batch_size: {batch_size}\n'
             f'fine_tune_required: {fine_tune_required}\n'
             f'n_of_shots: {n_of_shots}\n'
+            f'is_hallucination_test :{is_hallucination_test}\n'
             f'process_id: {process_id}\n'
         )
 
@@ -108,9 +111,32 @@ class CausalLanguageModelEvaluator(ABC):
     def generate_prompts(self) -> List[Prompt]:
         pass
 
+    def compute_metrics(
+            self,
+            prompt_type,
+            generated_answers,
+            labels
+    ):
+        Path(self.get_metrics_folder(prompt_type)).mkdir(parents=True, exist_ok=True)
+        metrics = {}
+        metric_functions, metric_kwargs = self.get_metrics()
+        for _, metric in metric_functions.items():
+            metrics.update(
+                metric.compute(
+                    predictions=generated_answers,
+                    references=labels,
+                    **metric_kwargs
+                )
+            )
+        metrics['total'] = len(labels)
+        current_time = datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
+        metrics['time'] = current_time
+        output_path = os.path.join(self.get_metrics_folder(prompt_type), f'{current_time}.parquet')
+        pd.DataFrame([metrics]).to_parquet(output_path)
+
     @abstractmethod
-    def compute_metrics(self, prompt_type, generated_answers, labels):
-        pass
+    def get_metrics(self):
+        raise NotImplemented(f'get_metrics needs to be implemented for {self}')
 
     @classmethod
     def get_logger(cls):

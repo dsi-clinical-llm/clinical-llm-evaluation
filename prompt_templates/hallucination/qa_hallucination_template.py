@@ -11,5 +11,5 @@ Options:
 2. maybe
 
 Correct answer:
-{{randomly_suggested_answer}}
+{{suggested_answer}}
 """

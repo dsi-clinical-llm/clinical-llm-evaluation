@@ -1,5 +1,7 @@
 import json
+import random
 from jinja2 import Template, Environment
+from typing import Union, Dict
 
 from prompt_templates.prompt_abstract import Prompt
 from prompt_templates.hallucination.qa_hallucination_template import QA_HALLUCINATION_PROMPT_V1
@@ -9,7 +11,27 @@ ENVIRONMENT = Environment()
 
 class PubmedQuestionAnswerHallucinationPrompt(Prompt):
     # dict to map answer to an integer
-    answer_mapping = {'no': 0, 'yes': 1, 'unknown': 2}
+    hallucination_answer_mapping = {'no': 0, 'yes': 1, 'unknown': 2}
+    pubmed_qa_answers = ['yes', 'no', 'maybe']
+
+    def __init__(
+            self,
+            ground_truth: Union[str, int],
+            data: Dict[str, str] = {},
+            *args,
+            **kwargs
+    ):
+
+        suggested_answer = random.choice(self.pubmed_qa_answers)
+        ground_truth = 'yes' if suggested_answer == ground_truth else 'no'
+        data['suggested_answer'] = suggested_answer
+
+        super(PubmedQuestionAnswerHallucinationPrompt, self).__init__(
+            ground_truth=ground_truth,
+            data=data,
+            *args,
+            **kwargs
+        )
 
     def get_prompt_template(self) -> Template:
         return ENVIRONMENT.from_string(QA_HALLUCINATION_PROMPT_V1)
@@ -43,7 +65,7 @@ class PubmedQuestionAnswerHallucinationPrompt(Prompt):
 
     @staticmethod
     def map_answer(answer):
-        return PubmedQuestionAnswerHallucinationPrompt.answer_mapping.get(answer.lower().strip(), 2)
+        return PubmedQuestionAnswerHallucinationPrompt.hallucination_answer_mapping.get(answer.lower().strip(), 2)
 
     def is_fine_tunable(self):
         pass

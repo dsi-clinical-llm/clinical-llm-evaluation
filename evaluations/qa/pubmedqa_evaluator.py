@@ -1,19 +1,29 @@
-import os
-from pathlib import Path
-from datetime import datetime
 from typing import List
 
 import evaluate
-import pandas as pd
+import numpy as np
 
+from prompt_templates.prompt_abstract import Prompt
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
 from prompt_templates.qa.qa_prompt import PubmedQuestionAnswerPromptBase, \
     PubmedQuestionAnswerPromptV1, PubmedQuestionAnswerPromptCotV1
 
 
+class PointWiseScore:
+    @staticmethod
+    def compute(
+            predictions,
+            references,
+            **kwargs
+    ):
+        match_score = np.sum((predictions == references).astype(int) * 1)
+        mismatch_score = - np.sum((predictions != references).astype(int) * 0.25)
+        return match_score + mismatch_score
+
+
 class PubMedQaEvaluator(CausalLanguageModelEvaluator):
 
-    def get_prompt_classes(self) -> List[PubmedQuestionAnswerPromptBase]:
+    def get_prompt_classes(self) -> List[Prompt]:
         return [
             PubmedQuestionAnswerPromptBase,
             PubmedQuestionAnswerPromptV1,
@@ -24,7 +34,6 @@ class PubMedQaEvaluator(CausalLanguageModelEvaluator):
             self,
             record
     ) -> List[PubmedQuestionAnswerPromptBase]:
-
         identifier = record['pubid']
         question = record['question']
         abstract = '\n'.join(record['context']['contexts'])
@@ -39,32 +48,9 @@ class PubMedQaEvaluator(CausalLanguageModelEvaluator):
             prompts.append(prompt)
         return prompts
 
-    def compute_metrics(
-            self,
-            prompt_type,
-            generated_answers,
-            labels,
-            **kwargs
-    ):
-        Path(self.get_metrics_folder(prompt_type)).mkdir(parents=True, exist_ok=True)
-        metrics = {}
-        for _, metric in self.get_metrics().items():
-            metrics.update(
-                metric.compute(
-                    predictions=generated_answers,
-                    references=labels,
-                    average='micro'
-                )
-            )
-        metrics['total'] = len(labels)
-        current_time = datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
-        metrics['time'] = current_time
-        output_path = os.path.join(self.get_metrics_folder(prompt_type), f'{current_time}.parquet')
-        pd.DataFrame([metrics]).to_parquet(output_path)
-
-    @staticmethod
-    def get_metrics() -> dict:
+    def get_metrics(self) -> dict:
+        # Return the regular metrics for the QA task
         recall_metric = evaluate.load('recall')
         precision_metric = evaluate.load('precision')
         f1_metric = evaluate.load('f1')
-        return {'recall': recall_metric, 'precision': precision_metric, 'f1': f1_metric}
+        return {'recall': recall_metric, 'precision': precision_metric, 'f1': f1_metric}, {'average': 'micro'}
