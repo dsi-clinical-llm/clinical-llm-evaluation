@@ -25,7 +25,7 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
             response = self.model_response.replace("&quot;", "\"")
             try:
                 json_object = json.loads(response)
-                final_answer = json_object.get('correct_option', 'unknown')
+                final_answer = str(json_object.get('correct_option', 'unknown'))
                 final_answer = remove_non_utf8_characters(remove_illegal_chars(final_answer))
             except Exception as e:
                 print(e)
@@ -38,7 +38,7 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
                 json_string = response[left_bracket_index:right_bracket_index + 1]
                 try:
                     json_object = json.loads(json_string)
-                    final_answer = json_object.get('correct_option', 'unknown')
+                    final_answer = str(json_object.get('correct_option', 'unknown'))
                     final_answer = remove_non_utf8_characters(remove_illegal_chars(final_answer))
                 except Exception as e:
                     print(e)
