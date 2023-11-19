@@ -5,7 +5,7 @@ import numpy as np
 
 from prompt_templates.prompt_abstract import Prompt
 from evaluations.qa.pubmedqa_evaluator import PubMedQaEvaluator
-from prompt_templates.hallucination.qa_hallucination_prompt import PubmedQuestionAnswerHallucinationPrompt
+from prompt_templates.hallucination.qa.qa_hallucination_prompt import PubmedQuestionAnswerHallucinationPrompt
 
 
 class PointWiseScore:

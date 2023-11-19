@@ -5,7 +5,7 @@ from typing import Union, Dict
 
 from utils.utils import remove_illegal_chars
 from prompt_templates.prompt_abstract import Prompt
-from prompt_templates.hallucination.qa_hallucination_template import QA_HALLUCINATION_PROMPT_V1
+from prompt_templates.hallucination.qa.qa_hallucination_template import QA_HALLUCINATION_PROMPT_V1
 
 ENVIRONMENT = Environment()
 
