@@ -12,7 +12,7 @@ def extract_from_json_response(
         default_value='unknown'
 ) -> str:
     final_answer = None
-    response = model_response.replace("&quot;", "\"")
+    response = model_response.replace("&quot;", "\"").replace("'", "\"")
     try:
         json_object = json.loads(response)
         final_answer = str(json_object.get(field, default_value))
@@ -32,7 +32,8 @@ def extract_from_json_response(
             final_answer = remove_non_utf8_characters(remove_illegal_chars(final_answer))
         except Exception as e:
             print(e)
-    return final_answer
+
+    return final_answer if final_answer else default_value
 
 
 def remove_non_utf8_characters(s):

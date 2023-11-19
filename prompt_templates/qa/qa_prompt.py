@@ -1,7 +1,6 @@
-import json
 from jinja2 import Template, Environment
 
-from utils.utils import remove_illegal_chars, remove_non_utf8_characters
+from utils.utils import remove_illegal_chars, extract_from_json_response
 from prompt_templates.prompt_abstract import Prompt
 from prompt_templates.qa.pubmed_qa_prompt_template import PUBMED_QA_PROMPT_TEMPLATE_JSON_V3, \
     PUBMED_QA_PROMPT_TEMPLATE_JSON_V1, PUBMED_QA_PROMPT_TEMPLATE_JSON_V2, PUBMED_QA_PROMPT_TEMPLATE_BASE_V1
@@ -19,31 +18,13 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
     def extract_answer(
             self
     ):
-        final_answer = None
-        if self.model_response:
-            # This is done for loading the json object
-            response = self.model_response.replace("&quot;", "\"")
-            try:
-                json_object = json.loads(response)
-                final_answer = str(json_object.get('correct_option', 'unknown'))
-                final_answer = remove_non_utf8_characters(remove_illegal_chars(final_answer))
-            except Exception as e:
-                print(e)
 
-            # Try to target the json object
-            if not final_answer:
-                left_bracket_index = response.find('{')
-                right_bracket_index = response.find('}')
-                # Assuming the first match is the JSON string
-                json_string = response[left_bracket_index:right_bracket_index + 1]
-                try:
-                    json_object = json.loads(json_string)
-                    final_answer = str(json_object.get('correct_option', 'unknown'))
-                    final_answer = remove_non_utf8_characters(remove_illegal_chars(final_answer))
-                except Exception as e:
-                    print(e)
-
-        return final_answer if final_answer else 'unknown'
+        answer = extract_from_json_response(
+            model_response=self.model_response,
+            field='correct_option',
+            default_value='unknown'
+        )
+        return answer
 
     @staticmethod
     def map_answer(answer):
