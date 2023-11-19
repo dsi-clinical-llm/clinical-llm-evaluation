@@ -12,6 +12,7 @@ import pandas as pd
 
 from datasets.dataset_dict import DatasetDict, Dataset
 from prompt_templates.prompt_abstract import Prompt
+from utils.utils import find_and_delete_corrupted_parquet_files
 
 
 class CausalLanguageModelEvaluator(ABC):
@@ -84,6 +85,9 @@ class CausalLanguageModelEvaluator(ABC):
         self.flush_records(results)
 
         for prompt_type in results.keys():
+            # Remove the corrupted parquet files
+            find_and_delete_corrupted_parquet_files(self.get_results_folder(prompt_type))
+
             results = pd.read_parquet(
                 self.get_results_folder(prompt_type)
             )

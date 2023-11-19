@@ -25,10 +25,10 @@ class PubMedQaEvaluator(CausalLanguageModelEvaluator):
 
     def get_prompt_classes(self) -> List[Prompt]:
         return [
-            # PubmedQuestionAnswerPromptBaseV1,
+            PubmedQuestionAnswerPromptBaseV1,
             PubmedQuestionAnswerPromptJsonV1,
-            # PubmedQuestionAnswerPromptJsonV2,
-            # PubmedQuestionAnswerPromptJsonV3
+            PubmedQuestionAnswerPromptJsonV2,
+            PubmedQuestionAnswerPromptJsonV3
         ]
 
     def generate_prompts(
