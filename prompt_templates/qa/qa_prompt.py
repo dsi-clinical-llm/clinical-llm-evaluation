@@ -10,7 +10,8 @@ ENVIRONMENT = Environment()
 
 class PubmedQuestionAnswerPromptJsonV1(Prompt):
     # dict to map answer to an integer
-    answer_mapping = {'no': 0, 'yes': 1, 'maybe': 2, 'unknown': 3}
+    answer_idx_mapping = {'no': 0, 'yes': 1, 'maybe': 2, 'unknown': 3}
+    idx_answer_mapping = {v: k for k, v in answer_idx_mapping.items()}
 
     def get_prompt_template(self) -> Template:
         return ENVIRONMENT.from_string(PUBMED_QA_PROMPT_TEMPLATE_JSON_V1)
@@ -23,11 +24,21 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
             field='correct_option',
             default_value='unknown'
         )
+
+        if answer == 'unknown':
+            correct_option_index = extract_from_json_response(
+                model_response=self.model_response,
+                field='correct_option_index',
+                default_value='unknown'
+            )
+            if correct_option_index.isnumeric():
+                answer = self.idx_answer_mapping.get(int(correct_option_index), 'unknown')
+
         return remove_illegal_chars(answer)
 
     @staticmethod
     def map_answer(answer):
-        return PubmedQuestionAnswerPromptJsonV1.answer_mapping.get(answer.lower().strip(), 3)
+        return PubmedQuestionAnswerPromptJsonV1.answer_idx_mapping.get(answer.lower().strip(), 3)
 
 
 class PubmedQuestionAnswerPromptJsonV2(PubmedQuestionAnswerPromptJsonV1):
@@ -63,4 +74,4 @@ class PubmedQuestionAnswerPromptBaseV1(Prompt):
 
     @staticmethod
     def map_answer(answer):
-        return PubmedQuestionAnswerPromptJsonV1.answer_mapping.get(answer.lower().strip(), 3)
+        return PubmedQuestionAnswerPromptJsonV1.answer_idx_mapping.get(answer.lower().strip(), 3)
