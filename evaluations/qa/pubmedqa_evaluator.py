@@ -25,26 +25,29 @@ class PubMedQaEvaluator(CausalLanguageModelEvaluator):
 
     def get_prompt_classes(self) -> List[Prompt]:
         return [
-            PubmedQuestionAnswerPromptBaseV1,
+            # PubmedQuestionAnswerPromptBaseV1,
             PubmedQuestionAnswerPromptJsonV1,
-            PubmedQuestionAnswerPromptJsonV2,
-            PubmedQuestionAnswerPromptJsonV3
+            # PubmedQuestionAnswerPromptJsonV2,
+            # PubmedQuestionAnswerPromptJsonV3
         ]
 
     def generate_prompts(
             self,
-            record
-    ) -> List[PubmedQuestionAnswerPromptJsonV1]:
+            record,
+            few_shot_records
+    ) -> List[Prompt]:
+
         identifier = record['pubid']
         question = record['question']
         abstract = '\n'.join(record['context']['contexts'])
         label = record['final_decision']
         prompts = []
         for prompt_class in self.get_prompt_classes():
+            few_shot_examples = self.prepare_few_shot_records(few_shot_records, prompt_class.map_answer)
             prompt = prompt_class(
                 ground_truth=label,
                 record_id=identifier,
-                data={'abstract': abstract, 'question': question}
+                data={'abstract': abstract, 'question': question, 'examples': few_shot_examples}
             )
             prompts.append(prompt)
         return prompts
@@ -55,3 +58,19 @@ class PubMedQaEvaluator(CausalLanguageModelEvaluator):
         precision_metric = evaluate.load('precision')
         f1_metric = evaluate.load('f1')
         return {'recall': recall_metric, 'precision': precision_metric, 'f1': f1_metric}, {'average': 'micro'}
+
+    @staticmethod
+    def prepare_few_shot_records(few_shot_records, answer_mapping_func):
+        few_shot_examples = []
+        if few_shot_records:
+            for record in few_shot_records:
+                question = record['question']
+                abstract = '\n'.join(record['context']['contexts'])
+                label = record['final_decision']
+                few_shot_examples.append({
+                    'question': question,
+                    'abstract': abstract,
+                    'correct_option': label,
+                    'correct_option_index': answer_mapping_func(label)
+                })
+        return few_shot_examples

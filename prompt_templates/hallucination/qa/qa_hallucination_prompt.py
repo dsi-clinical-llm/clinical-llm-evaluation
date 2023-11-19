@@ -69,6 +69,3 @@ class PubmedQuestionAnswerHallucinationPrompt(Prompt):
     @staticmethod
     def map_answer(answer):
         return PubmedQuestionAnswerHallucinationPrompt.hallucination_answer_mapping.get(answer.lower().strip(), 2)
-
-    def is_fine_tunable(self):
-        pass

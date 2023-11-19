@@ -29,9 +29,6 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
     def map_answer(answer):
         return PubmedQuestionAnswerPromptJsonV1.answer_mapping.get(answer.lower().strip(), 3)
 
-    def is_fine_tunable(self):
-        return True
-
 
 class PubmedQuestionAnswerPromptJsonV2(PubmedQuestionAnswerPromptJsonV1):
 
@@ -64,12 +61,6 @@ class PubmedQuestionAnswerPromptBaseV1(Prompt):
 
         return final_answer
 
-    def is_fine_tunable(self):
-        return False
-
     @staticmethod
     def map_answer(answer):
         return PubmedQuestionAnswerPromptJsonV1.answer_mapping.get(answer.lower().strip(), 3)
-
-    def is_fine_tunable(self):
-        return True

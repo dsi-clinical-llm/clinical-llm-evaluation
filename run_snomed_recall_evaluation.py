@@ -4,7 +4,7 @@ from datasets import load_from_disk
 from utils.evaluation_args import add_main_arguments
 from utils.utils import create_train_test_partitions
 from evaluations.memorization.snomed_recall_evaluator import SnomedRecallEvaluator
-from run_qa_evaluation import main, RANDOM_SEED
+from run_qa_evaluation import parallel_evaluation, RANDOM_SEED
 
 
 def create_argparser():
@@ -42,7 +42,7 @@ if __name__ == '__main__':
         )
 
     with Pool(processes=args.num_of_cores) as p:
-        p.starmap(main, pool_tuples)
+        p.starmap(parallel_evaluation, pool_tuples)
         p.close()
         p.join()
 

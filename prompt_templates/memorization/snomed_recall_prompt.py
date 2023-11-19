@@ -21,6 +21,3 @@ class SnomedCodeRecallPrompt(Prompt):
             default_value='unknown'
         )
         return answer
-
-    def is_fine_tunable(self):
-        pass

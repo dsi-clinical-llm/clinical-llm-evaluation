@@ -2,10 +2,11 @@ from multiprocessing import Pool
 from evaluations import PubMedQaEvaluator
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
 from evaluations.hallucination.pubmedqa_hallucination_evaluator import PubMedQaHallucinationEvaluator
-from models import get_all_model_names, get_model_wrapper, CausalLanguageModelApi
+from models import get_model_wrapper
 
 from datasets import load_dataset
 from utils.utils import create_train_test_partitions, get_all_args
+from utils.evaluation_args import add_main_arguments
 
 TEST_SIZE = 0.2
 RANDOM_SEED = 42
@@ -13,54 +14,20 @@ RANDOM_SEED = 42
 
 def create_argparser():
     import argparse
-    import sys
     parser = argparse.ArgumentParser(description='QA evaluation')
+    add_main_arguments(parser)
     parser.add_argument(
-        '--evaluation_folder',
-        dest='evaluation_folder',
-        action='store',
-        help='The path for your evaluation_folder',
-        required=True
-    )
-    parser.add_argument(
-        '--num_of_cores',
-        dest='num_of_cores',
+        '--n_of_shots',
+        dest='n_of_shots',
         action='store',
         type=int,
-        default=1,
+        default=0,
         required=False
-    )
-    parser.add_argument(
-        '--is_hallucination_test',
-        dest='is_hallucination_test',
-        action='store_true',
-    )
-    parser.add_argument(
-        '--model_choice',
-        dest='model_choice',
-        choices=get_all_model_names(),
-        required=True
-    )
-    parser.add_argument(
-        '--max_new_tokens',
-        dest='max_new_tokens',
-        required=False,
-        type=int,
-        default=512
-    )
-
-    endpoint_model_parser = parser.add_argument_group(CausalLanguageModelApi.get_name())
-    endpoint_model_parser.add_argument(
-        '--server_name',
-        dest='server_name',
-        action='store',
-        help='Servername for the LLM API',
-        required=CausalLanguageModelApi.get_name() in sys.argv
     )
     return parser.parse_args()
 
 
-def main(
+def parallel_evaluation(
         process_id,
         parsed_args,
         sub_dataset,
@@ -86,6 +53,7 @@ def main(
         dataset=sub_dataset,
         model=model_wrapper,
         evaluation_folder=parsed_args.evaluation_folder,
+        n_of_shots=parsed_args.n_of_shots,
         process_id=process_id
     )
     evaluator.evaluate()
@@ -116,7 +84,7 @@ if __name__ == '__main__':
         )
 
     with Pool(processes=args.num_of_cores) as p:
-        p.starmap(main, pool_tuples)
+        p.starmap(parallel_evaluation, pool_tuples)
         p.close()
         p.join()
 

@@ -6,10 +6,11 @@ from datetime import datetime
 from tqdm import tqdm
 import logging
 import os
+import random
 from pathlib import Path
 import pandas as pd
 
-from datasets.dataset_dict import DatasetDict
+from datasets.dataset_dict import DatasetDict, Dataset
 from prompt_templates.prompt_abstract import Prompt
 
 
@@ -55,9 +56,18 @@ class CausalLanguageModelEvaluator(ABC):
             # TODO
             pass
 
+        train_size = len(self._dataset['train'])
+
         results = dict()
         for record in tqdm(self._dataset['test']):
-            for prompt_container in self.generate_prompts(record):
+
+            few_shot_records = None
+            if self._n_of_shots > 0:
+                # Randomly select indexes
+                random_indexes = random.sample(range(train_size), self._n_of_shots)
+                few_shot_records = self._dataset['train'].select(random_indexes)
+
+            for prompt_container in self.generate_prompts(record, few_shot_records):
                 response = self._model.call(prompt_container.prompt)
                 prompt_container.set_model_response(response)
                 # Create an empty list if this prompt type is not in
@@ -108,8 +118,12 @@ class CausalLanguageModelEvaluator(ABC):
         pass
 
     @abstractmethod
-    def generate_prompts(self, record) -> List[Prompt]:
+    def generate_prompts(self, record, few_shot_records: Dataset = None) -> List[Prompt]:
         pass
+
+    @staticmethod
+    def map_answer(answer):
+        return answer
 
     def compute_metrics(
             self,

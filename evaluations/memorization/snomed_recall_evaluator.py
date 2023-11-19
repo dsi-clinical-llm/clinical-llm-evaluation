@@ -39,7 +39,11 @@ class SnomedRecallEvaluator(CausalLanguageModelEvaluator):
             SnomedCodeRecallPrompt
         ]
 
-    def generate_prompts(self, record) -> List[Prompt]:
+    def generate_prompts(
+            self,
+            record,
+            few_shot_records
+    ) -> List[Prompt]:
         identifier = record['concept_id']
         concept_name = record['concept_name']
         label = str(record['snomed_code'])
