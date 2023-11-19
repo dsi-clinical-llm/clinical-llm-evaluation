@@ -1,6 +1,9 @@
 import inspect
+import os
 import re
+import glob
 import json
+import pyarrow.parquet as pq
 from datasets import DatasetDict
 
 regex = re.compile('[^a-zA-Z]')
@@ -42,6 +45,27 @@ def remove_non_utf8_characters(s):
 
 def remove_illegal_chars(text):
     return regex.sub('', text)
+
+
+def find_and_delete_corrupted_parquet_files(parquet_folder):
+    def is_parquet_file_corrupted(file_path):
+        try:
+            # Try reading the Parquet file
+            pq.read_table(file_path)
+            return False
+        except Exception as e:
+            # If an error occurs, the file might be corrupted
+            print(f"Error occurred: {e}")
+            return True
+
+    # Create a search pattern for all .parquet files
+    search_pattern = f"{parquet_folder}/*.parquet"
+
+    # Use glob to find files matching the pattern
+    for parquet_file in glob.glob(search_pattern):
+        if is_parquet_file_corrupted(parquet_file):
+            print(f"Deleting corrupted file: {parquet_file}")
+            os.remove(parquet_file)
 
 
 def split_dataset(dataset, n):
