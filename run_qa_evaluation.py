@@ -40,6 +40,13 @@ def create_argparser():
         choices=get_all_model_names(),
         required=True
     )
+    parser.add_argument(
+        '--max_new_tokens',
+        dest='max_new_tokens',
+        required=False,
+        type=int,
+        default=512
+    )
 
     endpoint_model_parser = parser.add_argument_group(CausalLanguageModelApi.get_name())
     endpoint_model_parser.add_argument(
@@ -69,6 +76,8 @@ def main(
     for default_arg in default_args:
         if hasattr(parsed_args, default_arg):
             arg_dict[default_arg] = getattr(parsed_args, default_arg)
+
+    arg_dict['max_new_tokens'] = parsed_args.max_new_tokens
 
     model_wrapper = model_wrapper_class(**arg_dict)
     evaluator_class = PubMedQaHallucinationEvaluator if parsed_args.is_hallucination_test else PubMedQaEvaluator
