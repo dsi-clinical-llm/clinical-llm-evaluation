@@ -4,7 +4,7 @@ from datasets import load_from_disk
 from utils.evaluation_args import add_main_arguments
 from utils.utils import create_train_test_partitions
 from evaluations.memorization.snomed_recall_evaluator import SnomedRecallEvaluator
-from run_qa_evaluation import main
+from run_qa_evaluation import main, RANDOM_SEED
 
 
 def create_argparser():
@@ -25,10 +25,13 @@ if __name__ == '__main__':
 
     args = create_argparser()
     snomed_dataset = load_from_disk(args.dataset_path)
-    snomed_dataset['test'] = snomed_dataset['train']
+    dataset = snomed_dataset['train'].train_test_split(
+        seed=RANDOM_SEED,
+        test_size=0.5
+    )
 
     partitioned_datasets = create_train_test_partitions(
-        snomed_dataset,
+        dataset,
         n=args.num_of_cores
     )
 
