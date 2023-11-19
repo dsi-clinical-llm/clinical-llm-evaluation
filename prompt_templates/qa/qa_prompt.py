@@ -1,7 +1,7 @@
 import json
 from jinja2 import Template, Environment
 
-from utils.utils import remove_illegal_chars
+from utils.utils import remove_illegal_chars, remove_non_utf8_characters
 from prompt_templates.prompt_abstract import Prompt
 from prompt_templates.qa.pubmed_qa_prompt_template import PUBMED_QA_PROMPT_TEMPLATE_JSON_V3, \
     PUBMED_QA_PROMPT_TEMPLATE_JSON_V1, PUBMED_QA_PROMPT_TEMPLATE_JSON_V2, PUBMED_QA_PROMPT_TEMPLATE_BASE_V1
@@ -26,7 +26,7 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
             try:
                 json_object = json.loads(response)
                 final_answer = json_object.get('correct_option', 'unknown')
-                final_answer = remove_illegal_chars(final_answer)
+                final_answer = remove_non_utf8_characters(remove_illegal_chars(final_answer))
             except Exception as e:
                 print(e)
 
@@ -39,7 +39,7 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
                 try:
                     json_object = json.loads(json_string)
                     final_answer = json_object.get('correct_option', 'unknown')
-                    final_answer = remove_illegal_chars(final_answer)
+                    final_answer = remove_non_utf8_characters(remove_illegal_chars(final_answer))
                 except Exception as e:
                     print(e)
 
