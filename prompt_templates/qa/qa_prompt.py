@@ -18,13 +18,12 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
     def extract_answer(
             self
     ):
-
         answer = extract_from_json_response(
             model_response=self.model_response,
             field='correct_option',
             default_value='unknown'
         )
-        return answer
+        return remove_illegal_chars(answer)
 
     @staticmethod
     def map_answer(answer):
@@ -59,8 +58,7 @@ class PubmedQuestionAnswerPromptBaseV1(Prompt):
             parsed_answer = self.model_response.lower()
             parsed_answer = parsed_answer.replace('answer', '').replace('option', '')
             # Take the first word from the answer
-            final_answer = parsed_answer.split(' ')[0]
-            final_answer = remove_illegal_chars(final_answer)
+            final_answer = remove_illegal_chars(parsed_answer).split(' ')[0]
         else:
             final_answer = 'unknown'
 

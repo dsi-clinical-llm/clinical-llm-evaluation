@@ -16,7 +16,7 @@ def extract_from_json_response(
     try:
         json_object = json.loads(response)
         final_answer = str(json_object.get(field, default_value))
-        final_answer = remove_non_utf8_characters(remove_illegal_chars(final_answer))
+        final_answer = remove_non_utf8_characters(final_answer)
     except Exception as e:
         print(e)
 
@@ -29,7 +29,7 @@ def extract_from_json_response(
         try:
             json_object = json.loads(json_string)
             final_answer = str(json_object.get(field, default_value))
-            final_answer = remove_non_utf8_characters(remove_illegal_chars(final_answer))
+            final_answer = remove_non_utf8_characters(final_answer)
         except Exception as e:
             print(e)
 
