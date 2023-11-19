@@ -108,7 +108,7 @@ class CausalLanguageModelEvaluator(ABC):
         pass
 
     @abstractmethod
-    def generate_prompts(self) -> List[Prompt]:
+    def generate_prompts(self, record) -> List[Prompt]:
         pass
 
     def compute_metrics(

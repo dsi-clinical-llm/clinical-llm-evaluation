@@ -1,8 +1,38 @@
 import inspect
 import re
+import json
 from datasets import DatasetDict
 
 regex = re.compile('[^a-zA-Z]')
+
+
+def extract_from_json_response(
+        model_response,
+        field,
+        default_value='unknown'
+) -> str:
+    final_answer = None
+    response = model_response.replace("&quot;", "\"")
+    try:
+        json_object = json.loads(response)
+        final_answer = str(json_object.get(field, default_value))
+        final_answer = remove_non_utf8_characters(remove_illegal_chars(final_answer))
+    except Exception as e:
+        print(e)
+
+    # Try to target the json object
+    if not final_answer:
+        left_bracket_index = response.find('{')
+        right_bracket_index = response.find('}')
+        # Assuming the first match is the JSON string
+        json_string = response[left_bracket_index:right_bracket_index + 1]
+        try:
+            json_object = json.loads(json_string)
+            final_answer = str(json_object.get(field, default_value))
+            final_answer = remove_non_utf8_characters(remove_illegal_chars(final_answer))
+        except Exception as e:
+            print(e)
+    return final_answer
 
 
 def remove_non_utf8_characters(s):

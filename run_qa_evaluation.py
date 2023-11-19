@@ -1,5 +1,6 @@
 from multiprocessing import Pool
 from evaluations import PubMedQaEvaluator
+from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
 from evaluations.hallucination.pubmedqa_hallucination_evaluator import PubMedQaHallucinationEvaluator
 from models import get_all_model_names, get_model_wrapper, CausalLanguageModelApi
 
@@ -62,7 +63,8 @@ def create_argparser():
 def main(
         process_id,
         parsed_args,
-        sub_dataset
+        sub_dataset,
+        evaluator_class: CausalLanguageModelEvaluator
 ):
     model_wrapper_class = get_model_wrapper(parsed_args.model_choice)
     required_args, default_args = get_all_args(model_wrapper_class)
@@ -80,7 +82,6 @@ def main(
     arg_dict['max_new_tokens'] = parsed_args.max_new_tokens
 
     model_wrapper = model_wrapper_class(**arg_dict)
-    evaluator_class = PubMedQaHallucinationEvaluator if parsed_args.is_hallucination_test else PubMedQaEvaluator
     evaluator = evaluator_class(
         dataset=sub_dataset,
         model=model_wrapper,
@@ -105,10 +106,13 @@ if __name__ == '__main__':
         n=args.num_of_cores
     )
 
+    # Get the evaluator
+    pubmed_evaluator_class = PubMedQaHallucinationEvaluator if args.is_hallucination_test else PubMedQaEvaluator
+
     pool_tuples = []
     for i in range(args.num_of_cores):
         pool_tuples.append(
-            (i, args, partitioned_datasets[i])
+            (i, args, partitioned_datasets[i], pubmed_evaluator_class)
         )
 
     with Pool(processes=args.num_of_cores) as p:
