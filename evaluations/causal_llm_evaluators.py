@@ -99,6 +99,7 @@ class CausalLanguageModelEvaluator(ABC):
                 # Skip the records that have been processed
                 if prompt_container.get_prompt_type() in self._processed_ids:
                     if prompt_container.record_id in self._processed_ids[prompt_container.get_prompt_type()]:
+                        print(f'Skip {prompt_container.record_id} for {prompt_container.get_prompt_type()}')
                         continue
 
                 response = self._model.call(prompt_container.prompt)
