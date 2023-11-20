@@ -97,8 +97,9 @@ class CausalLanguageModelEvaluator(ABC):
             for prompt_container in self.generate_prompts(record, few_shot_records):
 
                 # Skip the records that have been processed
-                if prompt_container.record_id in self._processed_ids[prompt_container.get_prompt_type()]:
-                    continue
+                if prompt_container.get_prompt_type() in self._processed_ids:
+                    if prompt_container.record_id in self._processed_ids[prompt_container.get_prompt_type()]:
+                        continue
 
                 response = self._model.call(prompt_container.prompt)
                 prompt_container.set_model_response(response)
