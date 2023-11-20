@@ -76,6 +76,19 @@ class CausalLanguageModelEvaluator(ABC):
                             shutil.rmtree(results_folder)
                         except Exception as e:
                             raise RuntimeError(f"Failed to clean up the {results_folder} for a new evaluation. {e}")
+        else:
+            for prompt_class in self.get_prompt_classes():
+                prompt_type_name = prompt_class.__name__
+                self._processed_ids[prompt_type_name] = []
+                results_folder = self.get_results_folder(prompt_type_name)
+                search_pattern = f"{results_folder}/*.parquet"
+                # Use glob to find files matching the pattern
+                if len(glob.glob(search_pattern)) > 0:
+                    raise RuntimeError(
+                        f'{results_folder} contains evaluation results. '
+                        f'Please specify --restore_checkpoint in when running the valuation '
+                        f'if you want to pick up where you left off'
+                    )
 
     def evaluate(self):
 
