@@ -53,7 +53,7 @@ def parallel_evaluation(
         dataset=sub_dataset,
         model=model_wrapper,
         evaluation_folder=parsed_args.evaluation_folder,
-        n_of_shots=parsed_args.n_of_shots,
+        n_of_shots=parsed_args.n_of_shots if hasattr(parsed_args, 'n_of_shots') else 0,
         process_id=process_id
     )
     evaluator.evaluate()
