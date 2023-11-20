@@ -17,7 +17,8 @@ class PointWiseScore:
     ):
         match_score = np.sum((predictions == references).astype(int) * 1)
         mismatch_score = - np.sum((predictions != references).astype(int) * 0.25)
-        return {'point_wise_score': match_score + mismatch_score}
+        normalized_score = (match_score + mismatch_score) / len(predictions)
+        return {'point_wise_score': normalized_score}
 
 
 class PubMedQaHallucinationEvaluator(PubMedQaEvaluator):
