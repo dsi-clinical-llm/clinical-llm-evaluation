@@ -54,6 +54,7 @@ def parallel_evaluation(
         model=model_wrapper,
         evaluation_folder=parsed_args.evaluation_folder,
         n_of_shots=parsed_args.n_of_shots if hasattr(parsed_args, 'n_of_shots') else 0,
+        restore_checkpoint=parsed_args.restore_checkpoint,
         process_id=process_id
     )
     evaluator.evaluate()

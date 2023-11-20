@@ -36,6 +36,11 @@ def add_main_arguments(parser):
         type=int,
         default=512
     )
+    parser.add_argument(
+        '--restore_checkpoint',
+        dest='restore_checkpoint',
+        action='store_true',
+    )
 
     endpoint_model_parser = parser.add_argument_group(CausalLanguageModelApi.get_name())
     endpoint_model_parser.add_argument(

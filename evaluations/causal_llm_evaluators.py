@@ -6,6 +6,8 @@ from datetime import datetime
 from tqdm import tqdm
 import logging
 import os
+import glob
+import shutil
 import random
 from pathlib import Path
 import pandas as pd
@@ -26,7 +28,8 @@ class CausalLanguageModelEvaluator(ABC):
             fine_tune_required: bool = False,
             n_of_shots: int = 0,
             process_id: int = None,
-            is_hallucination_test: bool = False
+            is_hallucination_test: bool = False,
+            restore_checkpoint: bool = False
     ):
         self._evaluation_folder = evaluation_folder
         self._model = model
@@ -36,6 +39,7 @@ class CausalLanguageModelEvaluator(ABC):
         self._n_of_shots = n_of_shots
         self._process_id = process_id
         self._is_hallucination_test = is_hallucination_test
+        self._restore_checkpoint = restore_checkpoint
 
         self.get_logger().info(
             f'evaluation_folder: {evaluation_folder}\n'
@@ -45,11 +49,33 @@ class CausalLanguageModelEvaluator(ABC):
             f'fine_tune_required: {fine_tune_required}\n'
             f'n_of_shots: {n_of_shots}\n'
             f'is_hallucination_test :{is_hallucination_test}\n'
+            f'restore_checkpoint: {restore_checkpoint}\n'
             f'process_id: {process_id}\n'
         )
 
         if 'test' not in self._dataset:
             raise RuntimeError("The dataset doesn't contain a test set")
+
+        self._processed_ids = {}
+        if self._restore_checkpoint:
+            for prompt_class in self.get_prompt_classes():
+                prompt_type_name = prompt_class.__name__
+                self._processed_ids[prompt_type_name] = []
+
+                results_folder = self.get_results_folder(prompt_type_name)
+                search_pattern = f"{results_folder}/*.parquet"
+
+                # Use glob to find files matching the pattern
+                if len(glob.glob(search_pattern)) > 0:
+                    find_and_delete_corrupted_parquet_files(results_folder)
+                    results_df = pd.read_parquet(results_folder)
+                    if 'record_id' in results_df.columns:
+                        self._processed_ids[prompt_type_name] = results_df.record_id.tolist()
+                    else:
+                        try:
+                            shutil.rmtree(results_folder)
+                        except Exception as e:
+                            raise RuntimeError(f"Failed to clean up the {results_folder} for a new evaluation. {e}")
 
     def evaluate(self):
 
@@ -69,6 +95,11 @@ class CausalLanguageModelEvaluator(ABC):
                 few_shot_records = self._dataset['train'].select(random_indexes)
 
             for prompt_container in self.generate_prompts(record, few_shot_records):
+
+                # Skip the records that have been processed
+                if prompt_container.record_id in self._processed_ids[prompt_container.get_prompt_type()]:
+                    continue
+
                 response = self._model.call(prompt_container.prompt)
                 prompt_container.set_model_response(response)
                 # Create an empty list if this prompt type is not in
