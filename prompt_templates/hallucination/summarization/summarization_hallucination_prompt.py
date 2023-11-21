@@ -20,7 +20,7 @@ class SummarizationHallucinationPrompt(Prompt):
         # We try to find the number of high quality matches (High/Moderate matches)
         n_matches = set()
         for match in matching_data.matches:
-            if match.similarity_score not in ['High', 'Moderate']:
+            if match.similarity_score in ['High', 'Moderate']:
                 n_matches.add(match.summary_sent_no)
 
         return {
