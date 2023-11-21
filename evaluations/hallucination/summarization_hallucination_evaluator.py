@@ -17,7 +17,8 @@ class HallucinationScore:
             references,
             **kwargs
     ):
-        hallucination_scores = 1 - predictions / references
+        index = (references != 0)
+        hallucination_scores = 1 - predictions[index] / references[index]
         return {'hallucination_score': np.mean(hallucination_scores)}
 
 
@@ -28,7 +29,8 @@ class SimilarityScore:
             references,
             **kwargs
     ):
-        similarity_scores = np.mean(predictions / references)
+        index = (references != 0)
+        similarity_scores = np.mean(predictions[index] / references[index])
         return {'similarity_score': similarity_scores}
 
 
