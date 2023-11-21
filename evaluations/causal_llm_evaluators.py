@@ -109,6 +109,10 @@ class CausalLanguageModelEvaluator(ABC):
 
             for prompt_container in self.generate_prompts(record, few_shot_records):
 
+                # Create an empty list if this prompt type is not in
+                if prompt_container.get_prompt_type() not in results:
+                    results[prompt_container.get_prompt_type()] = []
+
                 # Skip the records that have been processed
                 if prompt_container.get_prompt_type() in self._processed_ids:
                     if prompt_container.record_id in self._processed_ids[prompt_container.get_prompt_type()]:
@@ -117,9 +121,8 @@ class CausalLanguageModelEvaluator(ABC):
 
                 response = self._model.call(prompt_container.prompt)
                 prompt_container.set_model_response(response)
-                # Create an empty list if this prompt type is not in
-                if prompt_container.get_prompt_type() not in results:
-                    results[prompt_container.get_prompt_type()] = []
+
+                # Store the result in a dictionary associated with this particular prompt
                 results[prompt_container.get_prompt_type()].append(prompt_container)
 
             if self._process_id:
