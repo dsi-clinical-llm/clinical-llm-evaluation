@@ -38,6 +38,8 @@ class SummarizationHallucinationPrompt(Prompt):
     ):
         matching_data = SentenceMatchingData()
         response = escape_double_quotes(self.model_response)
+        # Sometimes ChatGPT generates three ` chars at the beginning and the end of the response
+        response = response.replace('`', '')
         try:
             json_object = json.loads(response)
             matching_data = SentenceMatchingData(
