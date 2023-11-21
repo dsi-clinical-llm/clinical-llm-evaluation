@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field, asdict
-from typing import List, Dict, Union
+from typing import List
 
 
 @dataclass
@@ -46,3 +46,43 @@ class ModelParameter:
 
     def to_dict(self):
         return asdict(self)
+
+
+@dataclass
+class SentenceMatch:
+    summary: str
+    summary_sent_no: int
+    original_text: str
+    original_text_sent_no: int
+    similarity_score: str
+
+    def __post_init__(self):
+        # Convert string_field to a string, if it's not already
+        if not isinstance(self.summary_sent_no, int):
+            self.summary_sent_no = int(self.summary_sent_no)
+
+        # Convert int_field to an integer, if it's not already
+        if not isinstance(self.original_text_sent_no, int):
+            self.original_text_sent_no = int(self.original_text_sent_no)
+
+
+@dataclass
+class SentenceMatchingData:
+    matches: List[SentenceMatch] = field(default_factory=lambda: [])
+    no_matches: int = 0
+    summary_total: int = 0
+    original_text_total: int = 0
+
+    def __post_init__(self):
+        # Convert string_field to a string, if it's not already
+        if not isinstance(self.no_matches, int):
+            self.no_matches = int(self.no_matches)
+
+        if not isinstance(self.summary_total, int):
+            self.summary_total = int(self.summary_total)
+
+        if not isinstance(self.original_text_total, int):
+            self.original_text_total = int(self.original_text_total)
+
+    def failed(self):
+        return self.summary_total == 0 and self.original_text_total == 0

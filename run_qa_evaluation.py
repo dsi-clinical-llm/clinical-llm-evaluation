@@ -31,7 +31,9 @@ def parallel_evaluation(
         process_id,
         parsed_args,
         sub_dataset,
-        evaluator_class: CausalLanguageModelEvaluator
+        evaluator_class: CausalLanguageModelEvaluator,
+        *positional_args,
+        **kwargs
 ):
     model_wrapper_class = get_model_wrapper(parsed_args.model_choice)
     required_args, default_args = get_all_args(model_wrapper_class)
@@ -55,7 +57,9 @@ def parallel_evaluation(
         evaluation_folder=parsed_args.evaluation_folder,
         n_of_shots=parsed_args.n_of_shots if hasattr(parsed_args, 'n_of_shots') else 0,
         restore_checkpoint=parsed_args.restore_checkpoint,
-        process_id=process_id
+        process_id=process_id,
+        *positional_args,
+        **kwargs
     )
     evaluator.evaluate()
 

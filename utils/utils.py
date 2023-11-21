@@ -15,7 +15,7 @@ def extract_from_json_response(
         default_value='unknown'
 ) -> str:
     final_answer = None
-    response = model_response.replace("&quot;", "\"").replace("'", "\"")
+    response = model_response.replace("&quot;", "\"").replace("'", "\"").replace('"', "\"")
     try:
         json_object = json.loads(response)
         final_answer = str(json_object.get(field, default_value))
@@ -37,6 +37,14 @@ def extract_from_json_response(
             print(e)
 
     return final_answer if final_answer else default_value
+
+
+def escape_double_quotes(text):
+    return text.replace("&quot;", "\"").replace('"', "\"").replace("'", "\"")
+
+
+def remove_double_quotes(text):
+    return text.replace("&quot;", "").replace('"', "").replace("'", "")
 
 
 def remove_non_utf8_characters(s):

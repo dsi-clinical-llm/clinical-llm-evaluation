@@ -1,5 +1,5 @@
 import sys
-from models import get_all_model_names, CausalLanguageModelApi
+from models import get_all_model_names, CausalLanguageModelApi, CausalLanguageModelChatGPT
 
 
 def add_main_arguments(parser):
@@ -49,5 +49,14 @@ def add_main_arguments(parser):
         action='store',
         help='Servername for the LLM API',
         required=CausalLanguageModelApi.get_name() in sys.argv
+    )
+    endpoint_model_parser = parser.add_argument_group(CausalLanguageModelChatGPT.get_name())
+    endpoint_model_parser.add_argument(
+        '--chatgpt_model',
+        dest='chatgpt_model',
+        action='store',
+        choices=CausalLanguageModelChatGPT.model_choices,
+        help='The ChatGPT to use',
+        required=CausalLanguageModelChatGPT.get_name() in sys.argv
     )
     return parser

@@ -43,7 +43,7 @@ class PubmedQuestionAnswerHallucinationPrompt(Prompt):
         final_answer = None
         if self.model_response:
             # This is done for loading the json object
-            response = self.model_response.replace("&quot;", "\"")
+            response = self.model_response.replace("&quot;", "\"").replace('"', "\"").replace("'", "\"")
             try:
                 json_object = json.loads(response)
                 final_answer = json_object.get('is_answer_correct', 'unknown')
