@@ -59,11 +59,12 @@ class SentenceMatch:
     def __post_init__(self):
         # Convert string_field to a string, if it's not already
         if not isinstance(self.summary_sent_no, int):
-            self.summary_sent_no = int(self.summary_sent_no)
+            self.summary_sent_no = int(self.summary_sent_no) if str.isnumeric(self.summary_sent_no) else -1
 
         # Convert int_field to an integer, if it's not already
         if not isinstance(self.original_text_sent_no, int):
-            self.original_text_sent_no = int(self.original_text_sent_no)
+            self.original_text_sent_no = int(self.original_text_sent_no) if str.isnumeric(
+                self.original_text_sent_no) else -1
 
 
 @dataclass
@@ -76,13 +77,13 @@ class SentenceMatchingData:
     def __post_init__(self):
         # Convert string_field to a string, if it's not already
         if not isinstance(self.no_matches, int):
-            self.no_matches = int(self.no_matches)
+            self.no_matches = int(self.no_matches) if str.isnumeric(self.no_matches) else 0
 
         if not isinstance(self.summary_total, int):
-            self.summary_total = int(self.summary_total)
+            self.summary_total = int(self.summary_total) if str.isnumeric(self.summary_total) else 0
 
         if not isinstance(self.original_text_total, int):
-            self.original_text_total = int(self.original_text_total)
+            self.original_text_total = int(self.original_text_total) if str.isnumeric(self.original_text_total) else 0
 
     def failed(self):
         return self.summary_total == 0 and self.original_text_total == 0
