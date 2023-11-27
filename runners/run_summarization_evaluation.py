@@ -46,8 +46,9 @@ if __name__ == '__main__':
     summarization_dataset = load_dataset('ccdv/pubmed-summarization')
 
     test_size = len(summarization_dataset['test'])
+    random.seed(RANDOM_SEED)
     random_indexes = random.sample(range(test_size), 100)
-    summarization_dataset['test'] = summarization_dataset['test'].shuffle(seed=RANDOM_SEED).select(random_indexes)
+    summarization_dataset['test'] = summarization_dataset['test'].select(random_indexes)
 
     partitioned_datasets = create_train_test_partitions(
         summarization_dataset,
