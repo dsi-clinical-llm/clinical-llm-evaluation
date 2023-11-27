@@ -1,5 +1,5 @@
 transformers==4.34.0
-datasets==2.14.5
+datasets==2.13.1
 evaluate==0.4.0
 accelerate==0.23.0
 torch==2.0.1
@@ -10,3 +10,5 @@ requests~=2.31.0
 Jinja2~=3.1.2
 openai
 langchain
+rouge_score
+nltk
