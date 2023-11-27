@@ -1,7 +1,7 @@
 from models.model_wrapper import CausalLanguageModelWrapper
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Union
 from datetime import datetime
 from tqdm import tqdm
 import logging
@@ -13,7 +13,7 @@ from pathlib import Path
 import pandas as pd
 
 from datasets.dataset_dict import DatasetDict, Dataset
-from prompt_templates.prompt_abstract import Prompt
+from prompt_templates.prompt_abstract import Prompt, NestedPrompt
 from utils.utils import find_and_delete_corrupted_parquet_files
 
 
@@ -119,9 +119,16 @@ class CausalLanguageModelEvaluator(ABC):
                         print(f'Skip {prompt_container.record_id} for {prompt_container.get_prompt_type()}')
                         continue
 
-                response = self._model.call(prompt_container.prompt)
-                prompt_container.set_model_response(response)
+                # For nested prompt, we need to iteratively get the results
+                if isinstance(prompt_container, NestedPrompt):
+                    for each_prompt in prompt_container.get_prompts():
+                        each_prompt_response = self._model.call(each_prompt.prompt)
+                        each_prompt.set_model_response(each_prompt_response)
+                    response = self._model.call(prompt_container.get_prompt())
+                else:
+                    response = self._model.call(prompt_container.prompt)
 
+                prompt_container.set_model_response(response)
                 # Store the result in a dictionary associated with this particular prompt
                 results[prompt_container.get_prompt_type()].append(prompt_container)
 
@@ -171,7 +178,7 @@ class CausalLanguageModelEvaluator(ABC):
         pass
 
     @abstractmethod
-    def generate_prompts(self, record, few_shot_records: Dataset = None) -> List[Prompt]:
+    def generate_prompts(self, record, few_shot_records: Dataset = None) -> List[Union[Prompt, NestedPrompt]]:
         pass
 
     @staticmethod
