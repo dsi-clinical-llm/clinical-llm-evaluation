@@ -1,6 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
-import requests
 import logging
 
 from utils.llm_dataclasses import ModelParameter
@@ -41,8 +39,12 @@ class CausalLanguageModelWrapper(ABC):
         pass
 
     @abstractmethod
-    def call(self, batch_of_prompts) -> List[str]:
+    def call(self, prompt) -> str:
         pass
+
+    @classmethod
+    def get_name(cls) -> str:
+        return cls.__name__
 
     @classmethod
     def get_logger(cls):
@@ -59,34 +61,3 @@ class CausalLanguageModelWrapper(ABC):
             num_beams=self._num_beams,
             truncation_length=self._truncation_length
         )
-
-
-class CausalLanguageModelApi(CausalLanguageModelWrapper):
-    def __init__(
-            self,
-            server_name,
-            *args,
-            **kwargs
-    ):
-        super(CausalLanguageModelApi, self).__init__(*args, **kwargs)
-
-        self._end_point = f'http://{server_name}:5000/api/v1/chat'
-        self.get_logger().info(
-            f'server_name: {server_name}\n'
-        )
-
-    def fine_tune(self):
-        raise RuntimeError("CausalLanguageModelApi doesn't support fine-tuning currently.")
-
-    def call(self, batch_of_prompts):
-        results = []
-        for prompt in batch_of_prompts:
-            request = self.get_model_parameter(prompt=prompt).to_dict()
-            response = requests.post(self._end_point, json=request)
-            if response.status_code == 200:
-                result = response.json()['results'][0]['history']
-                answer = result['visible'][-1][1]
-                results.append(answer.lower().strip())
-            else:
-                results.append('Unknown')
-        return results
