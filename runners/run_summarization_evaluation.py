@@ -1,8 +1,9 @@
+import os
 import random
 from multiprocessing import Pool
 from evaluations.summarization.summarization_evaluator import SummarizationEvaluator
 
-from datasets import load_dataset
+from datasets import load_dataset, load_from_disk
 from utils.utils import create_train_test_partitions
 from utils.evaluation_args import add_main_arguments
 from run_qa_evaluation import parallel_evaluation, RANDOM_SEED, TEST_SIZE
@@ -12,6 +13,12 @@ def create_argparser():
     import argparse
     parser = argparse.ArgumentParser(description='Summarization evaluation')
     add_main_arguments(parser)
+    parser.add_argument(
+        '--local_dataset',
+        dest='local_dataset',
+        action='store',
+        required=False
+    )
     parser.add_argument(
         '--chunk_size',
         dest='chunk_size',
@@ -43,7 +50,10 @@ def create_argparser():
 if __name__ == '__main__':
 
     args = create_argparser()
-    summarization_dataset = load_dataset('ccdv/pubmed-summarization')
+    if args.local_dataset and os.path.exists(args.local_dataset):
+        summarization_dataset = load_from_disk(args.local_dataset)
+    else:
+        summarization_dataset = load_dataset('ccdv/pubmed-summarization')
 
     test_size = len(summarization_dataset['test'])
     random.seed(RANDOM_SEED)

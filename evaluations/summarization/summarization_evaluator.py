@@ -44,8 +44,7 @@ class SummarizationEvaluator(CausalLanguageModelEvaluator):
             record,
             few_shot_records
     ) -> List[NestedPrompt]:
-        # identifier = record['id']
-        identifier = 0
+        identifier = record['id'] if hasattr(record, 'id') else None
         article = record['article']
         abstract = record['abstract']
         prompts = []
@@ -53,11 +52,11 @@ class SummarizationEvaluator(CausalLanguageModelEvaluator):
             chunks = self.text_splitter.split_text(article)
             chunk_prompts = []
             for chunk in chunks:
-                num_of_words = int((len(chunk) / len(article)) * self.num_of_words)
+                # num_of_words = int((len(chunk) / len(article)) * self.num_of_words)
                 prompt = prompt_class(
                     ground_truth=abstract,
                     record_id=identifier,
-                    data={'article': chunk, 'num_of_words': num_of_words}
+                    data={'article': chunk, 'num_of_words': self.num_of_words}
                 )
                 chunk_prompts.append(prompt)
             prompts.append(
