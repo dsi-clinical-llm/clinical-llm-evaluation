@@ -1,6 +1,7 @@
 import os
 from openai import OpenAI
 from models.model_wrapper import CausalLanguageModelWrapper
+from langchain.chains import ConversationalRetrievalChain
 
 
 class CausalLanguageModelChatGPT(CausalLanguageModelWrapper):
@@ -25,12 +26,16 @@ class CausalLanguageModelChatGPT(CausalLanguageModelWrapper):
         raise NotImplemented('This capability has not been implemented yet')
 
     def call(self, prompt) -> str:
-        completion = self.openai_client.chat.completions.create(
-            model=self.chatgpt_model,
-            messages=[
-                {'role': 'system', 'content': 'You are a medical professional.'},
-                {'role': 'user', 'content': prompt}
-            ],
-            max_tokens=self._max_new_tokens
-        )
-        return completion.choices[0].message.content
+        try:
+            completion = self.openai_client.chat.completions.create(
+                model=self.chatgpt_model,
+                messages=[
+                    {'role': 'system', 'content': 'You are a medical professional.'},
+                    {'role': 'user', 'content': prompt}
+                ],
+                max_tokens=self._max_new_tokens
+            )
+            return completion.choices[0].message.content
+        except Exception as e:
+            self.get_logger().error(e)
+            raise e

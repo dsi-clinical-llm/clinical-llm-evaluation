@@ -34,9 +34,9 @@ class SummarizationEvaluator(CausalLanguageModelEvaluator):
             f'num_of_words: {num_of_words}\n'
         )
 
-    def get_prompt_classes(self) -> List[Prompt]:
+    def get_prompt_classes(self) -> List[NestedPrompt]:
         return [
-            SummarizationBasePrompt
+            SummarizationNestedPrompt
         ]
 
     def generate_prompts(
@@ -48,12 +48,13 @@ class SummarizationEvaluator(CausalLanguageModelEvaluator):
         article = record['article']
         abstract = record['abstract']
         prompts = []
-        for prompt_class in self.get_prompt_classes():
+        for nested_prompt_class in self.get_prompt_classes():
+            base_prompt_class = nested_prompt_class.get_base_prompt_class()
             chunks = self.text_splitter.split_text(article)
             chunk_prompts = []
             for chunk in chunks:
                 num_of_words = int((len(chunk) / len(article)) * self.num_of_words)
-                prompt = prompt_class(
+                prompt = base_prompt_class(
                     ground_truth=abstract,
                     record_id=identifier,
                     data={'article': chunk, 'num_of_words': num_of_words}

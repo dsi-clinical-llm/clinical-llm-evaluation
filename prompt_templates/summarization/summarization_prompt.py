@@ -32,6 +32,10 @@ class SummarizationNestedPrompt(NestedPrompt):
     def get_nested_prompt_template(self) -> Template:
         return ENVIRONMENT.from_string(NESTED_SUMMARIZATION_PROMPT_TEMPLATE)
 
+    @staticmethod
+    def get_base_prompt_class() -> Prompt:
+        return SummarizationBasePrompt
+
     def get_prompt(self):
         summaries = [prompt.model_response for prompt in self.prompts]
         return self.get_nested_prompt_template().render(summaries=summaries)
