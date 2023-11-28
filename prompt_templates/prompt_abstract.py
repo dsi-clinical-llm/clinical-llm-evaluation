@@ -83,6 +83,11 @@ class NestedPrompt(AbstractPrompt):
     def get_nested_prompt_template(self) -> Template:
         pass
 
+    @staticmethod
+    @abstractmethod
+    def get_base_prompt_class() -> Prompt:
+        pass
+
     @abstractmethod
     def get_prompt(self) -> str:
         pass

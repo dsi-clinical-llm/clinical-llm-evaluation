@@ -174,7 +174,7 @@ class CausalLanguageModelEvaluator(ABC):
         return os.path.join(self._evaluation_folder, prompt_type, 'metrics')
 
     @abstractmethod
-    def get_prompt_classes(self) -> List[Prompt]:
+    def get_prompt_classes(self) -> List[Union[Prompt, NestedPrompt]]:
         pass
 
     @abstractmethod
