@@ -37,6 +37,13 @@ def add_main_arguments(parser):
         default=512
     )
     parser.add_argument(
+        '--truncation_length',
+        dest='truncation_length',
+        required=False,
+        type=int,
+        default=4096
+    )
+    parser.add_argument(
         '--restore_checkpoint',
         dest='restore_checkpoint',
         action='store_true',

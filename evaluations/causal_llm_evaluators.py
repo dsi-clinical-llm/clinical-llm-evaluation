@@ -118,19 +118,22 @@ class CausalLanguageModelEvaluator(ABC):
                     if prompt_container.record_id in self._processed_ids[prompt_container.get_prompt_type()]:
                         print(f'Skip {prompt_container.record_id} for {prompt_container.get_prompt_type()}')
                         continue
+                try:
+                    # For nested prompt, we need to iteratively get the results
+                    if isinstance(prompt_container, NestedPrompt):
+                        for each_prompt in prompt_container.get_prompts():
+                            each_prompt_response = self._model.call(each_prompt.prompt)
+                            each_prompt.set_model_response(each_prompt_response)
+                        response = self._model.call(prompt_container.get_prompt())
+                    else:
+                        response = self._model.call(prompt_container.prompt)
 
-                # For nested prompt, we need to iteratively get the results
-                if isinstance(prompt_container, NestedPrompt):
-                    for each_prompt in prompt_container.get_prompts():
-                        each_prompt_response = self._model.call(each_prompt.prompt)
-                        each_prompt.set_model_response(each_prompt_response)
-                    response = self._model.call(prompt_container.get_prompt())
-                else:
-                    response = self._model.call(prompt_container.prompt)
+                    prompt_container.set_model_response(response)
+                    # Store the result in a dictionary associated with this particular prompt
+                    results[prompt_container.get_prompt_type()].append(prompt_container)
 
-                prompt_container.set_model_response(response)
-                # Store the result in a dictionary associated with this particular prompt
-                results[prompt_container.get_prompt_type()].append(prompt_container)
+                except Exception as e:
+                    self.get_logger().error(e)
 
             if self._process_id:
                 print(f'Process id: {self._process_id}')
