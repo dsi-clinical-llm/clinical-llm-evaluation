@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import logging
 
-from utils.llm_dataclasses import ModelParameter
+from utils.llm_dataclasses import ModelParameter, instruction_template_choices
 
 
 class CausalLanguageModelWrapper(ABC):
@@ -14,7 +14,8 @@ class CausalLanguageModelWrapper(ABC):
             top_p: float = 0.9,
             top_k: int = 20,
             num_beams: int = 1,
-            truncation_length: int = 2048
+            truncation_length: int = 2048,
+            instruction_template: str = 'Llama-v2'
     ):
         self._max_new_tokens = max_new_tokens
         self._auto_max_new_tokens = auto_max_new_tokens
@@ -24,6 +25,14 @@ class CausalLanguageModelWrapper(ABC):
         self._num_beams = num_beams
         self._truncation_length = truncation_length
 
+        if instruction_template not in instruction_template_choices:
+            raise RuntimeError(
+                f'{instruction_template} is not a valid instruction template. '
+                f'Here are the valid options: {instruction_template_choices}'
+            )
+
+        self._instruction_template = instruction_template
+
         self.get_logger().info(
             f'max_new_tokens: {max_new_tokens}\n'
             f'auto_max_new_tokens: {auto_max_new_tokens}\n'
@@ -32,6 +41,7 @@ class CausalLanguageModelWrapper(ABC):
             f'top_k: {top_k}\n'
             f'num_beams: {num_beams}\n'
             f'truncation_length: {truncation_length}\n'
+            f'instruction_template: {instruction_template}\n'
         )
 
     @abstractmethod
@@ -59,5 +69,6 @@ class CausalLanguageModelWrapper(ABC):
             top_p=self._top_p,
             top_k=self._top_k,
             num_beams=self._num_beams,
-            truncation_length=self._truncation_length
+            truncation_length=self._truncation_length,
+            instruction_template=self._instruction_template
         )

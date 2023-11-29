@@ -1,5 +1,6 @@
 import sys
 from models import get_all_model_names, CausalLanguageModelApi, CausalLanguageModelChatGPT
+from utils.llm_dataclasses import instruction_template_choices, DEFAULT_INSTRUCTION_TEMPLATE
 
 
 def add_main_arguments(parser):
@@ -35,6 +36,13 @@ def add_main_arguments(parser):
         required=False,
         type=int,
         default=512
+    )
+    parser.add_argument(
+        '--instruction_template',
+        dest='instruction_template',
+        required=False,
+        choices=instruction_template_choices,
+        default=DEFAULT_INSTRUCTION_TEMPLATE
     )
     parser.add_argument(
         '--truncation_length',

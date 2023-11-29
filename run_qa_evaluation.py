@@ -1,3 +1,4 @@
+import logging
 from multiprocessing import Pool
 from evaluations import PubMedQaEvaluator
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
@@ -10,6 +11,8 @@ from utils.evaluation_args import add_main_arguments
 
 TEST_SIZE = 0.2
 RANDOM_SEED = 42
+
+logging.basicConfig(level=logging.INFO)
 
 
 def create_argparser():
