@@ -53,7 +53,7 @@ class SummarizationEvaluator(CausalLanguageModelEvaluator):
             chunks = self.text_splitter.split_text(article)
             chunk_prompts = []
             for chunk in chunks:
-                num_of_words = int((len(chunk) / len(article)) * self.num_of_words)
+                num_of_words = self.num_of_words // 2
                 prompt = base_prompt_class(
                     ground_truth=abstract,
                     record_id=identifier,
