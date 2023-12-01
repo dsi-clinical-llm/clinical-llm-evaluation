@@ -1,2 +1,5 @@
+*.DS_Store
 .idea/
 *__pycache__*
+*png
+*.ipynb_checkpoints/
