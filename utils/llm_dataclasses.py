@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field, asdict
 from typing import List
 
+DEFAULT_INSTRUCTION_TEMPLATE = 'Llama-v2'
+instruction_template_choices = ['Llama-v2', 'Alpaca', 'Mistral', 'Vicuna-v1.1']
+
 
 @dataclass
 class ModelParameter:
