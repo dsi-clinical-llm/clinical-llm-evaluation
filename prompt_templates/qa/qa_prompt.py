@@ -34,6 +34,15 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
             if correct_option_index.isnumeric():
                 answer = self.idx_answer_mapping.get(int(correct_option_index), 'unknown')
 
+        if answer == 'unknown':
+            cleaned_model_response = self.model_response.strip().lower()
+            # first try to convert all the integer to the label
+            if cleaned_model_response.isnumeric():
+                if int(cleaned_model_response) in self.idx_answer_mapping:
+                    answer = self.idx_answer_mapping[int(cleaned_model_response)]
+            else:
+                answer = cleaned_model_response.split(' ')[0]
+
         return remove_illegal_chars(answer)
 
     @staticmethod
