@@ -1,5 +1,4 @@
-from transformers import pipeline
-
+from transformers import pipeline, AutoTokenizer
 from models.model_wrapper import CausalLanguageModelWrapper
 
 
@@ -17,9 +16,11 @@ class CausalLanguageModelHuggingFace(CausalLanguageModelWrapper):
 
         self._do_sample = do_sample
         self._device = device
+        tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
         self._pipeline = pipeline(
             'text-generation',
             model=model_name_or_path,
+            tokenizer=tokenizer,
             max_length=self._truncation_length,
             device_map=self._device,
             use_fast=False,
@@ -36,7 +37,12 @@ class CausalLanguageModelHuggingFace(CausalLanguageModelWrapper):
 
     def call(self, prompt):
         try:
-            response = self._pipeline(prompt, do_sample=self._do_sample, top_p=self._top_p)
+            response = self._pipeline(
+                prompt,
+                do_sample=self._do_sample,
+                top_p=self._top_p,
+                max_new_tokens=self._max_new_tokens
+            )
             return response[0]['generated_text'][len(prompt):]
         except Exception as e:
             self.get_logger().error(e)
