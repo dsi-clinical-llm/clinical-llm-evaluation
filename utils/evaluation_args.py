@@ -1,5 +1,6 @@
 import sys
-from models import get_all_model_names, CausalLanguageModelApi, CausalLanguageModelChatGPT
+from models import get_all_model_names, CausalLanguageModelApi, CausalLanguageModelChatGPT, \
+    CausalLanguageModelHuggingFace
 from utils.llm_dataclasses import instruction_template_choices, DEFAULT_INSTRUCTION_TEMPLATE
 
 
@@ -65,13 +66,29 @@ def add_main_arguments(parser):
         help='Servername for the LLM API',
         required=CausalLanguageModelApi.get_name() in sys.argv
     )
-    endpoint_model_parser = parser.add_argument_group(CausalLanguageModelChatGPT.get_name())
-    endpoint_model_parser.add_argument(
+    chatgpt_model_parser = parser.add_argument_group(CausalLanguageModelChatGPT.get_name())
+    chatgpt_model_parser.add_argument(
         '--chatgpt_model',
         dest='chatgpt_model',
         action='store',
         choices=CausalLanguageModelChatGPT.model_choices,
         help='The ChatGPT to use',
         required=CausalLanguageModelChatGPT.get_name() in sys.argv
+    )
+
+    hf_model_parser = parser.add_argument_group(CausalLanguageModelHuggingFace.get_name())
+    hf_model_parser.add_argument(
+        '--device',
+        dest='device',
+        action='store',
+        choices=['auto', 'cpu'],
+        default='auto',
+        required=False
+    )
+    hf_model_parser.add_argument(
+        '--model_name_or_path',
+        dest='model_name_or_path',
+        action='store',
+        required=CausalLanguageModelHuggingFace.get_name() in sys.argv
     )
     return parser
