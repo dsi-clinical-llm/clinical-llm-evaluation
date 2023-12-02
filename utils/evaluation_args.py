@@ -81,7 +81,7 @@ def add_main_arguments(parser):
         '--device',
         dest='device',
         action='store',
-        choices=['auto', 'cpu'],
+        choices=['auto', 'cpu', 'none'],
         default='auto',
         required=False
     )

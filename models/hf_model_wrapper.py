@@ -17,12 +17,17 @@ class CausalLanguageModelHuggingFace(CausalLanguageModelWrapper):
 
         self._do_sample = do_sample
         self._device = device
+        model_kwards = {
+            "load_in_4bit": True
+        }
+        if self._device and (self._device != 'none'):
+            model_kwards['device'] = self._device
+
         self._pipeline = pipeline(
             'text-generation',
             model=model_name_or_path,
             max_length=self._truncation_length,
-            device=self._device,
-            model_kwargs={"load_in_8bit": True}
+            model_kwargs=model_kwards
         )
 
         self.get_logger().info(

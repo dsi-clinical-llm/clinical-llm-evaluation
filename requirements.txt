@@ -12,3 +12,4 @@ openai
 langchain
 rouge_score
 nltk
+bitsandbytes
