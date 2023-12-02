@@ -34,5 +34,5 @@ class PubmedNameEntityRecognitionEvaluator(CausalLanguageModelEvaluator):
 
         return prompts
 
-    def get_metrics(self) -> dict:
-        return {}
+    def get_metrics(self) -> List[dict]:
+        return {}, {}
