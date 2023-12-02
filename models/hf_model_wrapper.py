@@ -22,6 +22,7 @@ class CausalLanguageModelHuggingFace(CausalLanguageModelWrapper):
             model=model_name_or_path,
             max_length=self._truncation_length,
             device_map=self._device,
+            use_fast=False,
             model_kwards={"load_in_8bit": True}
         )
 
