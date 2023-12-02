@@ -35,5 +35,9 @@ class CausalLanguageModelHuggingFace(CausalLanguageModelWrapper):
         raise RuntimeError("CausalLanguageModelHuggingFace doesn't support fine-tuning currently.")
 
     def call(self, prompt):
-        response = self._pipelin(prompt, do_sample=self._do_sample)
-        return response[len(prompt):]
+        response = self._pipelin(prompt, do_sample=self._do_sample, top_p=self._top_p)
+        try:
+            return response[0]['generated_text'][len(prompt):]
+        except Exception as e:
+            self.get_logger().error(e)
+            return ''
