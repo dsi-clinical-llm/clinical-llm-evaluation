@@ -146,7 +146,7 @@ class CausalLanguageModelEvaluator(ABC):
         # Final flush to the disk
         self.flush_records(results)
 
-        if self._skip_metrics:
+        if not self._skip_metrics:
             for prompt_type in results.keys():
                 # Remove the corrupted parquet files
                 find_and_delete_corrupted_parquet_files(self.get_results_folder(prompt_type))
