@@ -60,6 +60,7 @@ def parallel_evaluation(
         evaluation_folder=parsed_args.evaluation_folder,
         n_of_shots=parsed_args.n_of_shots if hasattr(parsed_args, 'n_of_shots') else 0,
         restore_checkpoint=parsed_args.restore_checkpoint,
+        skip_metrics=parsed_args.skip_metrics,
         process_id=process_id,
         *positional_args,
         **kwargs

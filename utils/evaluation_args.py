@@ -21,6 +21,11 @@ def add_main_arguments(parser):
         required=False
     )
     parser.add_argument(
+        '--skip_metrics',
+        dest='skip_metrics',
+        action='store_true'
+    )
+    parser.add_argument(
         '--is_hallucination_test',
         dest='is_hallucination_test',
         action='store_true',

@@ -29,7 +29,8 @@ class CausalLanguageModelEvaluator(ABC):
             n_of_shots: int = 0,
             process_id: int = None,
             is_hallucination_test: bool = False,
-            restore_checkpoint: bool = False
+            restore_checkpoint: bool = False,
+            skip_metrics: bool = False
     ):
         self._evaluation_folder = evaluation_folder
         self._model = model
@@ -40,6 +41,7 @@ class CausalLanguageModelEvaluator(ABC):
         self._process_id = process_id
         self._is_hallucination_test = is_hallucination_test
         self._restore_checkpoint = restore_checkpoint
+        self._skip_metrics = skip_metrics
 
         self.get_logger().info(
             f'evaluation_folder: {evaluation_folder}\n'
@@ -50,6 +52,7 @@ class CausalLanguageModelEvaluator(ABC):
             f'n_of_shots: {n_of_shots}\n'
             f'is_hallucination_test :{is_hallucination_test}\n'
             f'restore_checkpoint: {restore_checkpoint}\n'
+            f'skip_metrics: {skip_metrics}\n'
             f'process_id: {process_id}\n'
         )
 
@@ -143,16 +146,17 @@ class CausalLanguageModelEvaluator(ABC):
         # Final flush to the disk
         self.flush_records(results)
 
-        for prompt_type in results.keys():
-            # Remove the corrupted parquet files
-            find_and_delete_corrupted_parquet_files(self.get_results_folder(prompt_type))
+        if self._skip_metrics:
+            for prompt_type in results.keys():
+                # Remove the corrupted parquet files
+                find_and_delete_corrupted_parquet_files(self.get_results_folder(prompt_type))
 
-            results = pd.read_parquet(
-                self.get_results_folder(prompt_type)
-            )
-            labels = results.mapped_ground_true.to_numpy()
-            generated_answers = results.mapped_answer.to_numpy()
-            self.compute_metrics(prompt_type, generated_answers, labels)
+                results = pd.read_parquet(
+                    self.get_results_folder(prompt_type)
+                )
+                labels = results.mapped_ground_true.to_numpy()
+                generated_answers = results.mapped_answer.to_numpy()
+                self.compute_metrics(prompt_type, generated_answers, labels)
 
     def flush_records(self, results):
         for prompt_type, prompt_containers in results.items():
