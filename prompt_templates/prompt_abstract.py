@@ -20,7 +20,7 @@ class AbstractPrompt(ABC):
         self.model_response = None
         self.enable_chatgpt_utility = enable_chatgpt_utility
         if enable_chatgpt_utility:
-            self.chatgpt_utility = ChatGptUtility(chatgpt_model='gpt-4-32k', max_new_tokens=8192)
+            self.chatgpt_utility = ChatGptUtility(chatgpt_model='gpt-4-1106-preview', max_new_tokens=8192)
         else:
             self.chatgpt_utility = None
 
