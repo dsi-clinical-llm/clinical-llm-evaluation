@@ -1,10 +1,8 @@
-import json
 from jinja2 import Template, Environment
 
 from utils.utils import extract_json_from_text
 from prompt_templates.prompt_abstract import Prompt
 from prompt_templates.relation_extraction.biored.biored_re_prompt_template import BIORED_RE_PROMPT_TEMPLATE_BASE
-from models.chatgpt_wrapper import CausalLanguageModelChatGPT
 
 ENVIRONMENT = Environment()
 
