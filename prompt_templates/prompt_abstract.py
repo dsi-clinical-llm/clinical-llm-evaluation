@@ -13,15 +13,14 @@ class AbstractPrompt(ABC):
             self,
             ground_truth: Union[str, int],
             record_id: str = None,
-            enable_chatgpt_utility: bool = False,
-            max_new_tokens: int = 4096
+            enable_chatgpt_utility: bool = False
     ):
         self.ground_truth = ground_truth
         self.record_id = record_id
         self.model_response = None
         self.enable_chatgpt_utility = enable_chatgpt_utility
         if enable_chatgpt_utility:
-            self.chatgpt_utility = ChatGptUtility(chatgpt_model='gpt-4', max_new_tokens=max_new_tokens)
+            self.chatgpt_utility = ChatGptUtility(chatgpt_model='gpt-4', max_new_tokens=8192)
         else:
             self.chatgpt_utility = None
 

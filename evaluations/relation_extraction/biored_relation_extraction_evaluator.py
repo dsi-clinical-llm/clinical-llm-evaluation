@@ -125,7 +125,6 @@ class BioRedRelationExtractionEvaluator(CausalLanguageModelEvaluator):
                 ground_truth=relations,
                 record_id=identifier,
                 enable_chatgpt_utility=self._enable_chatgpt_utility,
-                max_new_tokens=self._model.max_new_token,
                 data={'list_of_entities': list_of_entities_str, 'passage': passage}
             )
             prompts.append(prompt)
