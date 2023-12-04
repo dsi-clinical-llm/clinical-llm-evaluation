@@ -46,6 +46,9 @@ class CausalLanguageModelWrapper(ABC):
             f'instruction_template: {instruction_template}\n'
         )
 
+    def max_new_token(self):
+        return self._max_new_tokens
+
     @abstractmethod
     def fine_tune(self):
         pass

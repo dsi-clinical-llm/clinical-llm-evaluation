@@ -26,6 +26,11 @@ def add_main_arguments(parser):
         action='store_true'
     )
     parser.add_argument(
+        '--enable_chatgpt_utility',
+        dest='enable_chatgpt_utility',
+        action='store_true'
+    )
+    parser.add_argument(
         '--is_hallucination_test',
         dest='is_hallucination_test',
         action='store_true',

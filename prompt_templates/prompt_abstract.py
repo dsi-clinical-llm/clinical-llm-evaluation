@@ -2,6 +2,7 @@ from abc import abstractmethod, ABC
 from typing import Union, Dict, List
 from jinja2 import Environment, Template
 from utils.utils import remove_non_utf8_characters
+from utils.chatgpt_utils import ChatGptUtility
 
 ENVIRONMENT = Environment()
 
@@ -11,11 +12,18 @@ class AbstractPrompt(ABC):
     def __init__(
             self,
             ground_truth: Union[str, int],
-            record_id: str = None
+            record_id: str = None,
+            enable_chatgpt_utility: bool = False,
+            max_new_tokens: int = 4096
     ):
         self.ground_truth = ground_truth
         self.record_id = record_id
         self.model_response = None
+        self.enable_chatgpt_utility = enable_chatgpt_utility
+        if enable_chatgpt_utility:
+            self.chatgpt_utility = ChatGptUtility(chatgpt_model='gpt-4', max_new_tokens=max_new_tokens)
+        else:
+            self.chatgpt_utility = None
 
     def to_dict(self) -> Dict[str, Union[str, int]]:
         answer = self.extract_answer()

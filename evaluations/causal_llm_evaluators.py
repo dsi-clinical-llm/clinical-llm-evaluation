@@ -30,7 +30,8 @@ class CausalLanguageModelEvaluator(ABC):
             process_id: int = None,
             is_hallucination_test: bool = False,
             restore_checkpoint: bool = False,
-            skip_metrics: bool = False
+            skip_metrics: bool = False,
+            enable_chatgpt_utility: bool = False
     ):
         self._evaluation_folder = evaluation_folder
         self._model = model
@@ -42,6 +43,7 @@ class CausalLanguageModelEvaluator(ABC):
         self._is_hallucination_test = is_hallucination_test
         self._restore_checkpoint = restore_checkpoint
         self._skip_metrics = skip_metrics
+        self._enable_chatgpt_utility = enable_chatgpt_utility
 
         self.get_logger().info(
             f'evaluation_folder: {evaluation_folder}\n'
@@ -53,6 +55,7 @@ class CausalLanguageModelEvaluator(ABC):
             f'is_hallucination_test :{is_hallucination_test}\n'
             f'restore_checkpoint: {restore_checkpoint}\n'
             f'skip_metrics: {skip_metrics}\n'
+            f'enable_chatgpt_utility: {enable_chatgpt_utility}\n'
             f'process_id: {process_id}\n'
         )
 

@@ -61,6 +61,7 @@ def parallel_evaluation(
         n_of_shots=parsed_args.n_of_shots if hasattr(parsed_args, 'n_of_shots') else 0,
         restore_checkpoint=parsed_args.restore_checkpoint,
         skip_metrics=parsed_args.skip_metrics,
+        enable_chatgpt_utility=parsed_args.enable_chatgpt_utility,
         process_id=process_id,
         *positional_args,
         **kwargs

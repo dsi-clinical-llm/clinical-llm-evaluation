@@ -1,9 +1,10 @@
-import json5
+import json
 import numpy as np
 from typing import List
 from utils.utils import extract_json_from_text
 
 from prompt_templates.prompt_abstract import Prompt
+from models.chatgpt_wrapper import CausalLanguageModelChatGPT
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
 from prompt_templates.relation_extraction.biored.biored_re_prompt import BioRedRelationExtractionPrompt
 
@@ -117,12 +118,14 @@ class BioRedRelationExtractionEvaluator(CausalLanguageModelEvaluator):
                 "offset": entity['offset']
             })
 
-        list_of_entities_str = json5.dumps(list_of_entities)
+        list_of_entities_str = json.dumps(list_of_entities)
         prompts = []
         for prompt_class in self.get_prompt_classes():
             prompt = prompt_class(
                 ground_truth=relations,
                 record_id=identifier,
+                enable_chatgpt_utility=self._enable_chatgpt_utility,
+                max_new_tokens=self._model.max_new_token,
                 data={'list_of_entities': list_of_entities_str, 'passage': passage}
             )
             prompts.append(prompt)
