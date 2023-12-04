@@ -16,7 +16,7 @@ class CausalLanguageModelWrapper(ABC):
             num_beams: int = 1,
             truncation_length: int = 2048,
             instruction_template: str = 'Llama-v2',
-            chat_mode: str = 'chat-instruct'
+            chat_mode: str = 'instruct'
     ):
         self._max_new_tokens = max_new_tokens
         self._auto_max_new_tokens = auto_max_new_tokens

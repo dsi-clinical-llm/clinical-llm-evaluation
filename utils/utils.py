@@ -9,34 +9,49 @@ from datasets import DatasetDict
 regex = re.compile('[^a-zA-Z]')
 
 
+def extract_json_from_text(
+        blob_of_text
+) -> dict:
+    """
+    Extract a JSON object from a blob of text
+
+    :param blob_of_text:
+    :return:
+    """
+    json_object = None
+    blob_of_text = blob_of_text.replace("&quot;", "\"").replace("'", "\"").replace('"', "\"")
+    try:
+        json_object = json.loads(blob_of_text)
+    except Exception as e:
+        print(e)
+
+    # Try to target the json object
+    if not json_object:
+        # Find the first occurrence of the { char
+        left_bracket_index = blob_of_text.find('{')
+        # Find the last occurrence of the } char
+        right_bracket_index = blob_of_text.rfind('}')
+        # Assuming the first match is the JSON string
+        json_string = blob_of_text[left_bracket_index:right_bracket_index + 1]
+        try:
+            json_object = json.loads(json_string)
+        except Exception as e:
+            print(e)
+
+    return json_object
+
+
 def extract_from_json_response(
         model_response,
         field,
         default_value='unknown'
 ) -> str:
-    final_answer = None
-    response = model_response.replace("&quot;", "\"").replace("'", "\"").replace('"', "\"")
-    try:
-        json_object = json.loads(response)
+    json_object = extract_json_from_text(model_response)
+    if json_object:
         final_answer = str(json_object.get(field, default_value))
         final_answer = remove_non_utf8_characters(final_answer)
-    except Exception as e:
-        print(e)
-
-    # Try to target the json object
-    if not final_answer:
-        left_bracket_index = response.find('{')
-        right_bracket_index = response.find('}')
-        # Assuming the first match is the JSON string
-        json_string = response[left_bracket_index:right_bracket_index + 1]
-        try:
-            json_object = json.loads(json_string)
-            final_answer = str(json_object.get(field, default_value))
-            final_answer = remove_non_utf8_characters(final_answer)
-        except Exception as e:
-            print(e)
-
-    return final_answer if final_answer else default_value
+        return final_answer
+    return default_value
 
 
 def escape_double_quotes(text):

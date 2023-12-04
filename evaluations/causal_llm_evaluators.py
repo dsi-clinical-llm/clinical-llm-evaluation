@@ -154,8 +154,8 @@ class CausalLanguageModelEvaluator(ABC):
                 results = pd.read_parquet(
                     self.get_results_folder(prompt_type)
                 )
-                labels = results.mapped_ground_true.to_numpy()
-                generated_answers = results.mapped_answer.to_numpy()
+                labels = results.mapped_ground_true
+                generated_answers = results.mapped_answer
                 self.compute_metrics(prompt_type, generated_answers, labels)
 
     def flush_records(self, results):
