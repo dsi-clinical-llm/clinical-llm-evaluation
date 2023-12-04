@@ -31,5 +31,5 @@ Passage: {{passage}}
 
 Entity list: {{list_of_entities}}
 
-You must only report the entity_relations in the JSON format, do not include entities in the JSON response:
+You must only report the entity_relations in the JSON format.
 """
