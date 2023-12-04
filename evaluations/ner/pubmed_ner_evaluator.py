@@ -1,7 +1,5 @@
 from typing import List
 
-import evaluate
-
 from prompt_templates.prompt_abstract import Prompt
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
 from prompt_templates.ner.pubmed_ner.pubmed_ner_prompt import PubmedNameEntityRecognition
