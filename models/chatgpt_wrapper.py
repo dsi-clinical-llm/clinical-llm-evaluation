@@ -6,11 +6,11 @@ from langchain.chains import ConversationalRetrievalChain
 
 class CausalLanguageModelChatGPT(CausalLanguageModelWrapper):
     # model = "gpt-3.5-turbo"
-    model_choices = ['gpt-4', 'gpt-3.5-turbo']
+    model_choices = ['gpt-4', 'gpt-3.5-turbo', 'gpt-3.5-turbo-1106', 'gpt-4-32k']
 
     def __init__(
             self,
-            chatgpt_model="gpt-3.5-turbo",
+            chatgpt_model="gpt-3.5-turbo-1106",
             *args,
             **kwargs
     ):

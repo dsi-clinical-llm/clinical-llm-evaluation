@@ -35,19 +35,29 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
                 answer = self.idx_answer_mapping.get(int(correct_option_index), 'unknown')
 
         if answer == 'unknown':
-            cleaned_model_response = self.model_response.strip().lower()
-            # first try to convert all the integer to the label
-            if cleaned_model_response.isnumeric():
-                if int(cleaned_model_response) in self.idx_answer_mapping:
-                    answer = self.idx_answer_mapping[int(cleaned_model_response)]
-            else:
-                answer = cleaned_model_response.split(' ')[0]
+            cleaned_model_response = self.model_response.strip().lower().replace('answer', '').replace('option', '')
+            answer = self.recursive_parse(cleaned_model_response)
 
         return remove_illegal_chars(answer)
 
+    def recursive_parse(self, cleaned_model_response):
+        # first try to convert all the integer to the label
+        if cleaned_model_response.isnumeric():
+            if int(cleaned_model_response) in self.idx_answer_mapping:
+                answer = self.idx_answer_mapping[int(cleaned_model_response)]
+                return answer
+            else:
+                return 'unknown'
+        else:
+            # Handle the format like 1. Yes / Yes
+            answer_parts = cleaned_model_response.split('.')
+            if len(answer_parts) > 1:
+                return self.recursive_parse(answer_parts[0])
+            return answer_parts[0]
+
     @staticmethod
     def map_answer(answer):
-        return PubmedQuestionAnswerPromptJsonV1.answer_idx_mapping.get(answer.lower().strip(), 3)
+        return PubmedQuestionAnswerPromptJsonV1.answer_idx_mapping.get(str(answer).lower().strip(), 3)
 
 
 class PubmedQuestionAnswerPromptJsonV2(PubmedQuestionAnswerPromptJsonV1):

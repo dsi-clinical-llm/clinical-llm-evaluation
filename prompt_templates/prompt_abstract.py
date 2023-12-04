@@ -19,7 +19,7 @@ class AbstractPrompt(ABC):
 
     def to_dict(self) -> Dict[str, Union[str, int]]:
         answer = self.extract_answer()
-        mapped_answer = self.map_answer(str(answer))
+        mapped_answer = self.map_answer(answer)
         return {
             'record_id': self.record_id,
             'prompt': self.get_prompt(),

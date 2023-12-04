@@ -21,6 +21,11 @@ def add_main_arguments(parser):
         required=False
     )
     parser.add_argument(
+        '--skip_metrics',
+        dest='skip_metrics',
+        action='store_true'
+    )
+    parser.add_argument(
         '--is_hallucination_test',
         dest='is_hallucination_test',
         action='store_true',
@@ -51,6 +56,13 @@ def add_main_arguments(parser):
         required=False,
         type=int,
         default=4096
+    )
+    parser.add_argument(
+        '--top_p',
+        dest='top_p',
+        required=False,
+        type=float,
+        default=0.9
     )
     parser.add_argument(
         '--restore_checkpoint',

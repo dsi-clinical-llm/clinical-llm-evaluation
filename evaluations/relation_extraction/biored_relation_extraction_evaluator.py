@@ -1,0 +1,133 @@
+import json5
+import numpy as np
+from typing import List
+from utils.utils import extract_json_from_text
+
+from prompt_templates.prompt_abstract import Prompt
+from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
+from prompt_templates.relation_extraction.biored.biored_re_prompt import BioRedRelationExtractionPrompt
+
+
+class BioRedMetric:
+
+    @staticmethod
+    def convert_to_triplets(list_of_relations):
+        list_of_triplets = []
+        for relations_json in list(list_of_relations):
+            triplets = set()
+            if isinstance(relations_json, str):
+                relations_json = extract_json_from_text(relations_json)
+
+            for relation_json in relations_json:
+                if 'entity1_identifier' not in relation_json:
+                    relation_json['entity1_identifier'] = ''
+                if 'relation' not in relation_json:
+                    relation_json['relation'] = ''
+                if 'entity2_identifier' not in relation_json:
+                    relation_json['entity2_identifier'] = ''
+                triplets.add(
+                    f'{relation_json["entity1_identifier"]}-{relation_json["relation"]}-{relation_json["entity2_identifier"]}')
+                triplets.add(
+                    f'{relation_json["entity2_identifier"]}-{relation_json["relation"]}-{relation_json["entity1_identifier"]}')
+            list_of_triplets.append(triplets)
+        return list_of_triplets
+
+
+class BioRedRecall(BioRedMetric):
+
+    @staticmethod
+    def compute(
+            predictions,
+            references,
+            **kwargs
+    ):
+        all_pred_triplets = BioRedMetric.convert_to_triplets(predictions)
+        all_true_triplets = BioRedMetric.convert_to_triplets(references)
+
+        recalls = []
+        for pred_triplets_per_record, true_triplets_per_record in zip(all_pred_triplets, all_true_triplets):
+            intersection_set = pred_triplets_per_record & true_triplets_per_record
+            recall = float(len(intersection_set)) / len(true_triplets_per_record)
+            recalls.append(recall)
+        return {'recall': np.asarray(recalls)}
+
+
+class BioRedPrecision(BioRedMetric):
+    @staticmethod
+    def compute(
+            predictions,
+            references,
+            **kwargs
+    ):
+        all_pred_triplets = BioRedMetric.convert_to_triplets(predictions)
+        all_true_triplets = BioRedMetric.convert_to_triplets(references)
+
+        precisions = []
+        for pred_triplets_per_record, true_triplets_per_record in zip(all_pred_triplets, all_true_triplets):
+            intersection_set = pred_triplets_per_record & true_triplets_per_record
+            if len(pred_triplets_per_record) > 0:
+                precision = float(len(intersection_set)) / len(pred_triplets_per_record)
+            else:
+                precision = 0
+            precisions.append(precision)
+        return {'precision': np.asarray(precisions)}
+
+
+class BioRedF1(BioRedMetric):
+
+    @staticmethod
+    def compute(
+            predictions,
+            references,
+            **kwargs
+    ):
+        recall_metric = BioRedRecall.compute(predictions, references)
+        precision_metric = BioRedPrecision.compute(predictions, references)
+        recall = recall_metric['recall']
+        precision = precision_metric['precision']
+        denominator = recall + precision
+        numerator = 2 * recall * precision
+        f1 = np.divide(numerator, denominator, out=np.zeros_like(denominator), where=denominator != 0)
+        return {'f1': f1}
+
+
+class BioRedRelationExtractionEvaluator(CausalLanguageModelEvaluator):
+
+    def get_prompt_classes(self) -> List[Prompt]:
+        return [
+            BioRedRelationExtractionPrompt
+        ]
+
+    def generate_prompts(
+            self,
+            record,
+            few_shot_records
+    ) -> List[Prompt]:
+        identifier = record['document_id'] if 'document_id' in record else None
+        passage = record['passage']
+        entities = record['entities']
+        relations = record['mapped_relations']
+
+        list_of_entities = []
+        for entity in entities:
+            list_of_entities.append({
+                "identifier": entity['identifier'],
+                "entity_name": entity['text'],
+                "entity_type": entity['type'],
+                "offset": entity['offset']
+            })
+
+        list_of_entities_str = json5.dumps(list_of_entities)
+        prompts = []
+        for prompt_class in self.get_prompt_classes():
+            prompt = prompt_class(
+                ground_truth=relations,
+                record_id=identifier,
+                data={'list_of_entities': list_of_entities_str, 'passage': passage}
+            )
+            prompts.append(prompt)
+
+        return prompts
+
+    def get_metrics(self) -> List[dict]:
+        return {'recall': BioRedRecall, 'precision': BioRedPrecision, 'f1': BioRedF1}, {}

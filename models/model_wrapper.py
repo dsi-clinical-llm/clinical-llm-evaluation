@@ -15,7 +15,8 @@ class CausalLanguageModelWrapper(ABC):
             top_k: int = 20,
             num_beams: int = 1,
             truncation_length: int = 2048,
-            instruction_template: str = 'Llama-v2'
+            instruction_template: str = 'Llama-v2',
+            chat_mode: str = 'instruct'
     ):
         self._max_new_tokens = max_new_tokens
         self._auto_max_new_tokens = auto_max_new_tokens
@@ -24,6 +25,7 @@ class CausalLanguageModelWrapper(ABC):
         self._top_k = top_k
         self._num_beams = num_beams
         self._truncation_length = truncation_length
+        self._chat_mode = chat_mode
 
         if instruction_template not in instruction_template_choices:
             raise RuntimeError(
@@ -63,6 +65,7 @@ class CausalLanguageModelWrapper(ABC):
     def get_model_parameter(self, prompt: str = '') -> ModelParameter:
         return ModelParameter(
             user_input=prompt,
+            mode=self._chat_mode,
             max_new_tokens=self._max_new_tokens,
             auto_max_new_tokens=self._auto_max_new_tokens,
             temperature=self._temperature,
