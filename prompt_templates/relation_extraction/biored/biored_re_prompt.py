@@ -16,9 +16,13 @@ class BioRedRelationExtractionPrompt(Prompt):
             self
     ):
         extracted_relations = []
+
         json_object = extract_json_from_text(self.model_response)
-        if json_object:
+        if isinstance(json_object, dict):
             extracted_relations = json_object.get('entity_relations', [])
+        elif isinstance(json_object, list):
+            extracted_relations = json_object
+
         for relation in extracted_relations:
             if 'entity1' not in relation:
                 relation['entity_1'] = ''

@@ -7,7 +7,7 @@ As a skilled medical domain expert, you are assigned to analyze the relationship
 determine the relationships between these entities. Base your analysis on their names, types, and positions in the text.
 3. Identify Relevant Relations: The relationships you identify should fall into one of these categories: 'Association', 
 'Positive_Correlation', 'Bind', 'Negative_Correlation', 'Comparison', 'Conversion', 'Cotreatment', 'Drug_Interaction'.
-4. Strict JSON Output Formatting: Present your findings exclusively in the following JSON format:
+4. Strict JSON Output Formatting: You must present your findings exclusively in the following JSON format:
 {
     "entity_relations" : [{
         "entity1_identifier" : "[Identifier of the first entity]",

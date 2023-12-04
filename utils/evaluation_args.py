@@ -58,6 +58,13 @@ def add_main_arguments(parser):
         default=4096
     )
     parser.add_argument(
+        '--top_p',
+        dest='top_p',
+        required=False,
+        type=float,
+        default=0.9
+    )
+    parser.add_argument(
         '--restore_checkpoint',
         dest='restore_checkpoint',
         action='store_true',

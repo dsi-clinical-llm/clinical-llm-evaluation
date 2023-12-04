@@ -1,4 +1,4 @@
-import json
+import json5
 import numpy as np
 from typing import List
 from utils.utils import extract_json_from_text
@@ -117,7 +117,7 @@ class BioRedRelationExtractionEvaluator(CausalLanguageModelEvaluator):
                 "offset": entity['offset']
             })
 
-        list_of_entities_str = json.dumps(list_of_entities)
+        list_of_entities_str = json5.dumps(list_of_entities)
         prompts = []
         for prompt_class in self.get_prompt_classes():
             prompt = prompt_class(

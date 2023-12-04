@@ -2,7 +2,7 @@ import inspect
 import os
 import re
 import glob
-import json
+import json5
 import pyarrow.parquet as pq
 from datasets import DatasetDict
 
@@ -21,7 +21,7 @@ def extract_json_from_text(
     json_object = None
     blob_of_text = blob_of_text.replace("&quot;", "\"").replace("'", "\"").replace('"', "\"")
     try:
-        json_object = json.loads(blob_of_text)
+        json_object = json5.loads(blob_of_text)
     except Exception as e:
         print(e)
 
@@ -34,11 +34,25 @@ def extract_json_from_text(
         # Assuming the first match is the JSON string
         json_string = blob_of_text[left_bracket_index:right_bracket_index + 1]
         try:
-            json_object = json.loads(json_string)
+            json_object = json5.loads(json_string)
+        except Exception as e:
+            print(e)
+
+    # Try to target the json object
+    if not json_object:
+        # Find the first occurrence of the [ char
+        left_bracket_index = blob_of_text.find('[')
+        # Find the last occurrence of the ] char
+        right_bracket_index = blob_of_text.rfind(']')
+        # Assuming the first match is the JSON string
+        json_string = blob_of_text[left_bracket_index:right_bracket_index + 1]
+        try:
+            json_object = json5.loads(json_string)
         except Exception as e:
             print(e)
 
     return json_object
+
 
 
 def extract_from_json_response(
