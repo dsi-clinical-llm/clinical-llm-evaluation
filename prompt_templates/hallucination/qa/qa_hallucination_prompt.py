@@ -68,4 +68,4 @@ class PubmedQuestionAnswerHallucinationPrompt(Prompt):
 
     @staticmethod
     def map_answer(answer):
-        return PubmedQuestionAnswerHallucinationPrompt.hallucination_answer_mapping.get(answer.lower().strip(), 2)
+        return PubmedQuestionAnswerHallucinationPrompt.hallucination_answer_mapping.get(str(answer).lower().strip(), 2)

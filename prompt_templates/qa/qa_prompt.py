@@ -57,7 +57,7 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
 
     @staticmethod
     def map_answer(answer):
-        return PubmedQuestionAnswerPromptJsonV1.answer_idx_mapping.get(answer.lower().strip(), 3)
+        return PubmedQuestionAnswerPromptJsonV1.answer_idx_mapping.get(str(answer).lower().strip(), 3)
 
 
 class PubmedQuestionAnswerPromptJsonV2(PubmedQuestionAnswerPromptJsonV1):

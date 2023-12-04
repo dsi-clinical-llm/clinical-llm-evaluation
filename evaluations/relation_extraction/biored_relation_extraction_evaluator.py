@@ -1,5 +1,7 @@
 import json
+import numpy as np
 from typing import List
+from utils.utils import extract_json_from_text
 
 from prompt_templates.prompt_abstract import Prompt
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
@@ -10,11 +12,25 @@ class BioRedMetric:
 
     @staticmethod
     def convert_to_triplets(list_of_relations):
-        triplets = set()
-        for relation in list_of_relations:
-            triplets.add(f'{relation["entity1_identifier"]}-{relation["relation"]}-{relation["entity2_identifier"]}')
-            triplets.add(f'{relation["entity2_identifier"]}-{relation["relation"]}-{relation["entity1_identifier"]}')
-        return triplets
+        list_of_triplets = []
+        for relations_json in list(list_of_relations):
+            triplets = set()
+            if isinstance(relations_json, str):
+                relations_json = extract_json_from_text(relations_json)
+
+            for relation_json in relations_json:
+                if 'entity1_identifier' not in relation_json:
+                    relation_json['entity1_identifier'] = ''
+                if 'relation' not in relation_json:
+                    relation_json['relation'] = ''
+                if 'entity2_identifier' not in relation_json:
+                    relation_json['entity2_identifier'] = ''
+                triplets.add(
+                    f'{relation_json["entity1_identifier"]}-{relation_json["relation"]}-{relation_json["entity2_identifier"]}')
+                triplets.add(
+                    f'{relation_json["entity2_identifier"]}-{relation_json["relation"]}-{relation_json["entity1_identifier"]}')
+            list_of_triplets.append(triplets)
+        return list_of_triplets
 
 
 class BioRedRecall(BioRedMetric):
@@ -25,12 +41,15 @@ class BioRedRecall(BioRedMetric):
             references,
             **kwargs
     ):
-        prediction_triplets = BioRedMetric.convert_to_triplets(predictions)
-        reference_triplets = BioRedMetric.convert_to_triplets(references)
-        intersection_set = prediction_triplets & reference_triplets
+        all_pred_triplets = BioRedMetric.convert_to_triplets(predictions)
+        all_true_triplets = BioRedMetric.convert_to_triplets(references)
 
-        recall = float(len(intersection_set)) / len(reference_triplets)
-        return {'recall': recall}
+        recalls = []
+        for pred_triplets_per_record, true_triplets_per_record in zip(all_pred_triplets, all_true_triplets):
+            intersection_set = pred_triplets_per_record & true_triplets_per_record
+            recall = float(len(intersection_set)) / len(true_triplets_per_record)
+            recalls.append(recall)
+        return {'recall': np.asarray(recalls)}
 
 
 class BioRedPrecision(BioRedMetric):
@@ -40,12 +59,18 @@ class BioRedPrecision(BioRedMetric):
             references,
             **kwargs
     ):
-        prediction_triplets = BioRedMetric.convert_to_triplets(predictions)
-        reference_triplets = BioRedMetric.convert_to_triplets(references)
-        intersection_set = prediction_triplets & reference_triplets
+        all_pred_triplets = BioRedMetric.convert_to_triplets(predictions)
+        all_true_triplets = BioRedMetric.convert_to_triplets(references)
 
-        precision = float(len(intersection_set)) / len(prediction_triplets)
-        return {'precision': precision}
+        precisions = []
+        for pred_triplets_per_record, true_triplets_per_record in zip(all_pred_triplets, all_true_triplets):
+            intersection_set = pred_triplets_per_record & true_triplets_per_record
+            if len(pred_triplets_per_record) > 0:
+                precision = float(len(intersection_set)) / len(pred_triplets_per_record)
+            else:
+                precision = 0
+            precisions.append(precision)
+        return {'precision': np.asarray(precisions)}
 
 
 class BioRedF1(BioRedMetric):
@@ -56,13 +81,13 @@ class BioRedF1(BioRedMetric):
             references,
             **kwargs
     ):
-        prediction_triplets = BioRedMetric.convert_to_triplets(predictions)
-        reference_triplets = BioRedMetric.convert_to_triplets(references)
-        intersection_set = prediction_triplets & reference_triplets
-
-        recall = float(len(intersection_set)) / len(reference_triplets)
-        precision = float(len(intersection_set)) / len(prediction_triplets)
-        f1 = 2 * precision * recall / (precision + recall)
+        recall_metric = BioRedRecall.compute(predictions, references)
+        precision_metric = BioRedPrecision.compute(predictions, references)
+        recall = recall_metric['recall']
+        precision = precision_metric['precision']
+        denominator = recall + precision
+        numerator = 2 * recall * precision
+        f1 = np.divide(numerator, denominator, out=np.zeros_like(denominator), where=denominator != 0)
         return {'f1': f1}
 
 
@@ -81,7 +106,7 @@ class BioRedRelationExtractionEvaluator(CausalLanguageModelEvaluator):
         identifier = record['document_id'] if 'document_id' in record else None
         passage = record['passage']
         entities = record['entities']
-        relations = record['relations']
+        relations = record['mapped_relations']
 
         list_of_entities = []
         for entity in entities:
