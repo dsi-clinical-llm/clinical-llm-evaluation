@@ -30,4 +30,6 @@ strictly to the specified JSON structure, reflecting only the direct results of 
 Passage: {{passage}}
 
 Entity list: {{list_of_entities}}
+
+You must report the entity relations in the JSON format below:
 """
