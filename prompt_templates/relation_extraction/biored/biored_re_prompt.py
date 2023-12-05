@@ -17,6 +17,16 @@ class BioRedRelationExtractionPrompt(Prompt):
         'relation'
     ]
 
+    @staticmethod
+    def extract_entity_relations(json_object):
+        if isinstance(json_object, dict):
+            for potential_key in ['entity_relations', 'relations', 'relationships']:
+                extracted_relations = json_object.get(potential_key, [])
+                if extracted_relations:
+                    return extracted_relations
+            return json_object[next(json_object.keys())]
+        return json_object
+
     def get_prompt_template(self) -> Template:
         return ENVIRONMENT.from_string(BIORED_RE_PROMPT_TEMPLATE_BASE)
 
@@ -38,6 +48,7 @@ class BioRedRelationExtractionPrompt(Prompt):
                 extracted_relations = json_object.get(potential_key, [])
                 if len(extracted_relations) > 0:
                     break
+
         elif isinstance(json_object, list):
             extracted_relations = json_object
 

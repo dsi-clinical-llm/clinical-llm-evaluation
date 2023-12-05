@@ -3,7 +3,6 @@ import re
 import numpy as np
 from typing import List, Union
 from utils.utils import extract_json_from_text
-from itertools import chain
 
 from prompt_templates.prompt_abstract import Prompt
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
@@ -43,6 +42,8 @@ class BioRedMetric:
             # Continue if there aren't any relations capatured
             if relations_json is None or len(relations_json) == 0:
                 continue
+
+            relations_json = BioRedRelationExtractionPrompt.extract_entity_relations(relations_json)
 
             # Recursively unflatten the nested structure
             unflattened_relations_json = []
