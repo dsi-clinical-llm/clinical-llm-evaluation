@@ -62,6 +62,6 @@ class BioRedRelationExtractionPrompt(Prompt):
         cleaned_relations = []
         for relation in extracted_relations:
             cleaned_relations.append(
-                [{k: v} for k, v in relation.items() if k in self.output_columns]
+                {k: v for k, v in relation.items() if k in self.output_columns}
             )
         return json.dumps(cleaned_relations)
