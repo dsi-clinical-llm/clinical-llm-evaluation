@@ -8,6 +8,14 @@ ENVIRONMENT = Environment()
 
 
 class BioRedRelationExtractionPrompt(Prompt):
+    output_columns = [
+        'entity1_identifier',
+        'entity2_identifier',
+        'entity1',
+        'entity2',
+        'relation'
+    ]
+
     def get_prompt_template(self) -> Template:
         return ENVIRONMENT.from_string(BIORED_RE_PROMPT_TEMPLATE_BASE)
 
@@ -36,7 +44,16 @@ class BioRedRelationExtractionPrompt(Prompt):
                 relation['entity1_identifier'] = ''
             if 'entity2_identifier' not in relation:
                 relation['entity2_identifier'] = ''
+            if 'entity1' not in relation:
+                relation['entity1'] = ''
+            if 'entity2' not in relation:
+                relation['entity2'] = ''
             if 'relation' not in relation:
                 relation['relation'] = ''
 
-        return extracted_relations
+        cleaned_relations = []
+        for relation in extracted_relations:
+            cleaned_relations.append(
+                [{k: v} for k, v in relation.items() if k in self.output_columns]
+            )
+        return cleaned_relations

@@ -13,6 +13,6 @@ class ChatGptUtility(CausalLanguageModelChatGPT):
             self,
             text: str
     ):
-        text = text.replace(" ", "").replace("\n", "")
+        text = text.replace(" ", "").replace("\n", "").replace("\\", "")
         prompt = json_extract_prompt_template.render(text=text)
         return self.call(prompt)
