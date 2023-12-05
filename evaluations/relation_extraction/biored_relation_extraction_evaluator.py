@@ -1,7 +1,9 @@
 import json
+import re
 import numpy as np
 from typing import List, Union
 from utils.utils import extract_json_from_text
+from itertools import chain
 
 from prompt_templates.prompt_abstract import Prompt
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
@@ -11,11 +13,31 @@ from prompt_templates.relation_extraction.biored.biored_re_prompt import BioRedR
 class BioRedMetric:
 
     @staticmethod
+    def standardize_json_string(json_string):
+        cleaned_json_string = json_string.replace('array([', '[')
+        cleaned_json_string = re.sub('](\s)*,(\s)*(\n)*dtype=object\)', '],', cleaned_json_string)
+        cleaned_json_string = cleaned_json_string.replace('None', '""')
+        cleaned_json_string = re.sub('\],\n*\s+\]', '],]', cleaned_json_string)
+        cleaned_json_string = cleaned_json_string.strip()
+        if cleaned_json_string[-3:] == '],]':
+            cleaned_json_string = cleaned_json_string[:-3] + ']]'
+        return cleaned_json_string
+
+    @staticmethod
+    def recursive_add_relations(relations_json, total_relations_json=[]):
+        if isinstance(relations_json, Union[list, np.ndarray]):
+            for sub_relation_json in relations_json:
+                BioRedMetric.recursive_add_relations(sub_relation_json, total_relations_json)
+        elif isinstance(relations_json, dict):
+            total_relations_json.append(relations_json)
+
+    @staticmethod
     def convert_to_triplets(list_of_relations):
         list_of_triplets = []
         for relations_json in list(list_of_relations):
             triplets = set()
             if isinstance(relations_json, str):
+                relations_json = BioRedMetric.standardize_json_string(relations_json)
                 relations_json = extract_json_from_text(relations_json)
 
             # Continue if there aren't any relations capatured
@@ -23,10 +45,10 @@ class BioRedMetric:
                 continue
 
             # Recursively unflatten the nested structure
-            while isinstance(relations_json[0], Union[list, np.ndarray]):
-                relations_json = relations_json[0]
+            unflattened_relations_json = []
+            BioRedMetric.recursive_add_relations(relations_json, unflattened_relations_json)
 
-            for relation_json in relations_json:
+            for relation_json in unflattened_relations_json:
                 # This prevents any entry from being None and causing problems in constructing the triplets
                 relation_json = {k: (v or '') for k, v in relation_json.items()}
                 if 'entity1_identifier' not in relation_json:
