@@ -26,8 +26,9 @@ class BioRedRelationExtractionPrompt(Prompt):
         extracted_relations = []
 
         if self.enable_chatgpt_utility:
+            chatgpt_extracted_json = self.chatgpt_utility.extract_json_using_chatgpt(self.model_response)
             json_object = extract_json_from_text(
-                self.chatgpt_utility.extract_json_using_chatgpt(self.model_response)
+                chatgpt_extracted_json
             )
         else:
             json_object = extract_json_from_text(self.model_response)

@@ -1,7 +1,7 @@
 from jinja2 import Environment
 
 from models import CausalLanguageModelChatGPT
-from prompt_templates.utils.JsonExtractPromptTemplate import JSON_EXTRACTION_PROMPT_TEMPLATE
+from prompt_templates.utils.json_extract_prompt_template import JSON_EXTRACTION_PROMPT_TEMPLATE
 
 ENVIRONMENT = Environment()
 json_extract_prompt_template = ENVIRONMENT.from_string(JSON_EXTRACTION_PROMPT_TEMPLATE)
