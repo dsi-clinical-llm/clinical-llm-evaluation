@@ -54,6 +54,9 @@ class BioRedRelationExtractionPrompt(Prompt):
             if 'relation' not in relation:
                 relation['relation'] = ''
 
+            for column in self.output_columns:
+                relation[column] = relation[column] or ''
+
         cleaned_relations = []
         for relation in extracted_relations:
             cleaned_relations.append(
