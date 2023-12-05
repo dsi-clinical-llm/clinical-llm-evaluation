@@ -32,7 +32,10 @@ class BioRedRelationExtractionPrompt(Prompt):
             json_object = extract_json_from_text(self.model_response)
 
         if isinstance(json_object, dict):
-            extracted_relations = json_object.get('entity_relations', [])
+            for potential_key in ['entity_relations', 'relations', 'relationships']:
+                extracted_relations = json_object.get(potential_key, [])
+                if len(extracted_relations) > 0:
+                    break
         elif isinstance(json_object, list):
             extracted_relations = json_object
 
