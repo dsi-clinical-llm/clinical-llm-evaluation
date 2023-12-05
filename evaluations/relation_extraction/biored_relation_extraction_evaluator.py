@@ -1,10 +1,9 @@
 import json
 import numpy as np
-from typing import List
+from typing import List, Union
 from utils.utils import extract_json_from_text
 
 from prompt_templates.prompt_abstract import Prompt
-from models.chatgpt_wrapper import CausalLanguageModelChatGPT
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
 from prompt_templates.relation_extraction.biored.biored_re_prompt import BioRedRelationExtractionPrompt
 
@@ -19,7 +18,17 @@ class BioRedMetric:
             if isinstance(relations_json, str):
                 relations_json = extract_json_from_text(relations_json)
 
+            # Continue if there aren't any relations capatured
+            if relations_json is None or len(relations_json) == 0:
+                continue
+
+            # Recursively unflatten the nested structure
+            while isinstance(relations_json[0], Union[list, np.ndarray]):
+                relations_json = relations_json[0]
+
             for relation_json in relations_json:
+                # This prevents any entry from being None and causing problems in constructing the triplets
+                relation_json = {k: (v or '') for k, v in relation_json.items()}
                 if 'entity1_identifier' not in relation_json:
                     relation_json['entity1_identifier'] = ''
                 if 'relation' not in relation_json:
