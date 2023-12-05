@@ -14,7 +14,7 @@ class CausalLanguageModelWrapper(ABC):
             top_p: float = 0.9,
             top_k: int = 20,
             num_beams: int = 1,
-            truncation_length: int = 2048,
+            truncation_length: int = 32768,
             instruction_template: str = 'Llama-v2',
             chat_mode: str = 'instruct'
     ):

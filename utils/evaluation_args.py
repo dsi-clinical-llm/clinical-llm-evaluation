@@ -60,7 +60,7 @@ def add_main_arguments(parser):
         dest='truncation_length',
         required=False,
         type=int,
-        default=4096
+        default=32768
     )
     parser.add_argument(
         '--top_p',

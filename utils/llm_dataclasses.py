@@ -41,7 +41,7 @@ class ModelParameter:
     negative_prompt: str = ''
     seed: int = -1
     add_bos_token: float = True
-    truncation_length: int = 2048
+    truncation_length: int = 32768
     ban_eos_token: bool = False
     custom_token_bans: str = ''
     skip_special_tokens: float = True
