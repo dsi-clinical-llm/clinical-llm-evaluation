@@ -1,3 +1,4 @@
+import json
 from jinja2 import Template, Environment
 
 from utils.utils import extract_json_from_text
@@ -62,4 +63,4 @@ class BioRedRelationExtractionPrompt(Prompt):
             cleaned_relations.append(
                 [{k: v} for k, v in relation.items() if k in self.output_columns]
             )
-        return cleaned_relations
+        return json.dumps(cleaned_relations)
