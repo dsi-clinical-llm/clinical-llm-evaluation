@@ -5,9 +5,19 @@ import numpy as np
 
 from prompt_templates.prompt_abstract import Prompt
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
-from prompt_templates.qa.qa_prompt import MedQuADQuestionAnswerPromptV1, MedQuADQuestionAnswerPromptBaseV1
+from prompt_templates.qa.closed_book_qa_prompt import MedQuADQuestionAnswerPromptV1, MedQuADQuestionAnswerPromptBaseV1
 
 
+class PointWiseScore:
+    @staticmethod
+    def compute(
+            predictions,
+            references,
+            **kwargs
+    ):
+        match_score = np.sum((predictions == references).astype(int) * 1)
+        mismatch_score = - np.sum((predictions != references).astype(int) * 0.25)
+        return match_score + mismatch_score
 
 
 class MedQuADQaEvaluator(CausalLanguageModelEvaluator):
