@@ -1,11 +1,10 @@
+from typing import List
 from jinja2 import Template, Environment
 
 from utils.utils import remove_illegal_chars, extract_from_json_response
-from prompt_templates.prompt_abstract import Prompt
+from prompt_templates.prompt_abstract import Prompt, NestedPrompt
 from prompt_templates.qa.pubmed_qa_prompt_template import PUBMED_QA_PROMPT_TEMPLATE_JSON_V3, \
     PUBMED_QA_PROMPT_TEMPLATE_JSON_V1, PUBMED_QA_PROMPT_TEMPLATE_JSON_V2, PUBMED_QA_PROMPT_TEMPLATE_BASE_V1
-from prompt_templates.qa.medquad_qa_prompt_template import MEDQUAD_QA_PROMPT_TEMPLATE_V1, \
-    MEDQUAD_QA_PROMPT_TEMPLATE_BASE_V1
 
 ENVIRONMENT = Environment()
 
@@ -36,30 +35,11 @@ class PubmedQuestionAnswerPromptJsonV1(Prompt):
             if correct_option_index.isnumeric():
                 answer = self.idx_answer_mapping.get(int(correct_option_index), 'unknown')
 
-        if answer == 'unknown':
-            cleaned_model_response = self.model_response.strip().lower().replace('answer', '').replace('option', '')
-            answer = self.recursive_parse(cleaned_model_response)
-
         return remove_illegal_chars(answer)
-
-    def recursive_parse(self, cleaned_model_response):
-        # first try to convert all the integer to the label
-        if cleaned_model_response.isnumeric():
-            if int(cleaned_model_response) in self.idx_answer_mapping:
-                answer = self.idx_answer_mapping[int(cleaned_model_response)]
-                return answer
-            else:
-                return 'unknown'
-        else:
-            # Handle the format like 1. Yes / Yes
-            answer_parts = cleaned_model_response.split('.')
-            if len(answer_parts) > 1:
-                return self.recursive_parse(answer_parts[0])
-            return answer_parts[0]
 
     @staticmethod
     def map_answer(answer):
-        return PubmedQuestionAnswerPromptJsonV1.answer_idx_mapping.get(str(answer).lower().strip(), 3)
+        return PubmedQuestionAnswerPromptJsonV1.answer_idx_mapping.get(answer.lower().strip(), 3)
 
 
 class PubmedQuestionAnswerPromptJsonV2(PubmedQuestionAnswerPromptJsonV1):
@@ -98,54 +78,4 @@ class PubmedQuestionAnswerPromptBaseV1(Prompt):
         return PubmedQuestionAnswerPromptJsonV1.answer_idx_mapping.get(answer.lower().strip(), 3)
 
 
-class MedQuADQuestionAnswerPromptV1(Prompt):
-    def __init__(
-            self,
-            ground_truth: str,
-            record_id: str = None,
-    ):
-        self.ground_truth = ground_truth
-        self.record_id = record_id
 
-    def get_prompt_template(self) -> Template:
-        return ENVIRONMENT.from_string(MEDQUAD_QA_PROMPT_TEMPLATE_V1)
-
-    @staticmethod
-    def get_base_prompt_class() -> Prompt:
-        return MedQuADQuestionAnswerPromptV1
-
-    def extract_answer(
-            self
-    ):
-        return self.model_response
-
-
-'''
-class MedQuADQuestionAnswerPromptJsonV2(MedQuADQuestionAnswerPromptJsonV1):
-
-    def get_prompt_template(self) -> Template:
-        return ENVIRONMENT.from_string(MEDQUAD_QA_PROMPT_TEMPLATE_JSON_V2)
-
-'''
-
-
-class MedQuADQuestionAnswerPromptBaseV1(Prompt):
-    def __init__(
-            self,
-            ground_truth: str,
-            record_id: str = None,
-    ):
-        self.ground_truth = ground_truth
-        self.record_id = record_id
-
-    def get_prompt_template(self) -> Template:
-        return ENVIRONMENT.from_string(MEDQUAD_QA_PROMPT_TEMPLATE_BASE_V1)
-
-    @staticmethod
-    def get_base_prompt_class() -> Prompt:
-        return MedQuADQuestionAnswerPromptV1
-
-    def extract_answer(
-            self
-    ):
-        return self.model_response
