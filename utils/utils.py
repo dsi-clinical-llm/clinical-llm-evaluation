@@ -20,7 +20,7 @@ def extract_json_from_text(
     :return:
     """
     json_object = None
-    blob_of_text = blob_of_text.replace("&quot;", "\"").replace("'", "\"").replace('"', "\"")
+    blob_of_text = blob_of_text.replace("&quot;", "\"").replace("'", "\"").replace('"', "\"").replace('\\_', '_')
     try:
         json_object = json.loads(blob_of_text)
     except Exception as e:
