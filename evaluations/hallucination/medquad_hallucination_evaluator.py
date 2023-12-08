@@ -32,17 +32,6 @@ class SimilarityScore:
         return {'similarity_score': similarity_scores}
 
 
-class PointWiseScore:
-    @staticmethod
-    def compute(
-            predictions,
-            references,
-            **kwargs
-    ):
-        match_score = np.sum((predictions == references).astype(int) * 1)
-        mismatch_score = - np.sum((predictions != references).astype(int) * 0.25)
-        normalized_score = (match_score + mismatch_score) / len(predictions)
-        return {'point_wise_score': normalized_score}
 
 
 class MedQuADQaHallucinationEvaluator(MedQuADQaEvaluator):
