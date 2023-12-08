@@ -1,10 +1,13 @@
 import inspect
 import os
+import re
 import glob
 import json
 
 import pyarrow.parquet as pq
 from datasets import DatasetDict
+
+regex = re.compile('[^a-zA-Z]')
 
 
 def extract_json_from_text(
