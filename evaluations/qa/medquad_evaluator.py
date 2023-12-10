@@ -5,19 +5,32 @@ import numpy as np
 
 from prompt_templates.prompt_abstract import Prompt
 from evaluations.causal_llm_evaluators import CausalLanguageModelEvaluator
-from prompt_templates.qa.closed_book_qa_prompt import MedQuADQuestionAnswerPromptV1, MedQuADQuestionAnswerPromptBaseV1
+from prompt_templates.qa.qa_prompt import MedQuADQuestionAnswerPromptV1, MedQuADQuestionAnswerPromptBaseV1
 
 
-class PointWiseScore:
+class HallucinationScore:
     @staticmethod
     def compute(
             predictions,
             references,
             **kwargs
     ):
-        match_score = np.sum((predictions == references).astype(int) * 1)
-        mismatch_score = - np.sum((predictions != references).astype(int) * 0.25)
-        return match_score + mismatch_score
+        index = (references != 0)
+        hallucination_scores = 1 - predictions[index] / references[index]
+        return {'hallucination_score': np.mean(hallucination_scores)}
+
+
+class SimilarityScore:
+    @staticmethod
+    def compute(
+            predictions,
+            references,
+            **kwargs
+    ):
+        index = (references != 0)
+        similarity_scores = np.mean(predictions[index] / references[index])
+        return {'similarity_score': similarity_scores}
+
 
 
 class MedQuADQaEvaluator(CausalLanguageModelEvaluator):
@@ -70,3 +83,15 @@ class MedQuADQaEvaluator(CausalLanguageModelEvaluator):
                     'answer': label
                 })
         return few_shot_examples
+
+
+
+class MedQuADQaHallucinationEvaluator(MedQuADQaEvaluator):
+
+    def get_prompt_classes(self) -> List[Prompt]:
+        return [
+            MedQuADQuestionAnswerHallucinationPrompt
+        ]
+
+    def get_metrics(self):
+        return {'similarity_score': SimilarityScore, 'hallucination_score': HallucinationScore}, {}
