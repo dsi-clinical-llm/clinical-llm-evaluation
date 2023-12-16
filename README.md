@@ -7,7 +7,7 @@
 - Shrujan Varma Penmetsa sp4155
 - Sanket Sanjay Bhandari sb4719
 
-Emails <UNI>@columbia.edu
+Emails &lt;UNI&gt;@columbia.edu
 
 **Elsevier mentoer & co-memtors**: Dr. Elia Lima-Walton, Dr. Dasha Herrmannova, Sameer Chivukula, Pranita Mahajan
 
