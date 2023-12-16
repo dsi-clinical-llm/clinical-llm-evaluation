@@ -15,4 +15,3 @@ nltk
 bitsandbytes
 SentencePiece
 optimum
-json5

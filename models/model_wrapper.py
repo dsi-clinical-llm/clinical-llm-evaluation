@@ -14,7 +14,7 @@ class CausalLanguageModelWrapper(ABC):
             top_p: float = 0.9,
             top_k: int = 20,
             num_beams: int = 1,
-            truncation_length: int = 2048,
+            truncation_length: int = 32768,
             instruction_template: str = 'Llama-v2',
             chat_mode: str = 'instruct'
     ):
@@ -45,6 +45,9 @@ class CausalLanguageModelWrapper(ABC):
             f'truncation_length: {truncation_length}\n'
             f'instruction_template: {instruction_template}\n'
         )
+
+    def max_new_token(self):
+        return self._max_new_tokens
 
     @abstractmethod
     def fine_tune(self):

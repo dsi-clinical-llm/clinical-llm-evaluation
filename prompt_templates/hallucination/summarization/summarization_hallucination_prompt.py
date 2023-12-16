@@ -1,4 +1,4 @@
-import json5
+import json
 from jinja2 import Template, Environment
 from typing import Dict, Union
 
@@ -41,7 +41,7 @@ class SummarizationHallucinationPrompt(Prompt):
         # Sometimes ChatGPT generates three ` chars at the beginning and the end of the response
         response = response.replace('`', '')
         try:
-            json_object = json5.loads(response)
+            json_object = json.loads(response)
             matching_data = SentenceMatchingData(
                 matches=[SentenceMatch(**match) for match in json_object["matches"]],
                 no_matches=json_object["no_matches"],

@@ -2,7 +2,8 @@ import inspect
 import os
 import re
 import glob
-import json5
+import json
+
 import pyarrow.parquet as pq
 from datasets import DatasetDict
 
@@ -19,9 +20,9 @@ def extract_json_from_text(
     :return:
     """
     json_object = None
-    blob_of_text = blob_of_text.replace("&quot;", "\"").replace("'", "\"").replace('"', "\"")
+    blob_of_text = blob_of_text.replace("&quot;", "\"").replace("'", "\"").replace('"', "\"").replace('\\_', '_')
     try:
-        json_object = json5.loads(blob_of_text)
+        json_object = json.loads(blob_of_text)
     except Exception as e:
         print(e)
 
@@ -34,7 +35,7 @@ def extract_json_from_text(
         # Assuming the first match is the JSON string
         json_string = blob_of_text[left_bracket_index:right_bracket_index + 1]
         try:
-            json_object = json5.loads(json_string)
+            json_object = json.loads(json_string)
         except Exception as e:
             print(e)
 
@@ -47,12 +48,11 @@ def extract_json_from_text(
         # Assuming the first match is the JSON string
         json_string = blob_of_text[left_bracket_index:right_bracket_index + 1]
         try:
-            json_object = json5.loads(json_string)
+            json_object = json.loads(json_string)
         except Exception as e:
             print(e)
 
     return json_object
-
 
 
 def extract_from_json_response(

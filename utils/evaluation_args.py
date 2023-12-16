@@ -26,6 +26,11 @@ def add_main_arguments(parser):
         action='store_true'
     )
     parser.add_argument(
+        '--enable_chatgpt_utility',
+        dest='enable_chatgpt_utility',
+        action='store_true'
+    )
+    parser.add_argument(
         '--is_hallucination_test',
         dest='is_hallucination_test',
         action='store_true',
@@ -55,7 +60,7 @@ def add_main_arguments(parser):
         dest='truncation_length',
         required=False,
         type=int,
-        default=4096
+        default=32768
     )
     parser.add_argument(
         '--top_p',
