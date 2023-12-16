@@ -14,12 +14,3 @@ Correct answer:
 {{suggested_answer}}
 """
 
-Open_End_QA_HALLUCINATION_PROMPT_V1 = '''
-Below is an instruction that describes a task. Write a response that appropriately completes the request.  # noqa: E501
-
-    ### Instruction:
-    {{question}}
-
-    ### Response:
-    {{answer}}
-'''
